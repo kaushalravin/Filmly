@@ -4,15 +4,34 @@ const cors=require('cors');
 const cookieParser=require('cookie-parser');
 
 const authRoutes=require('./routes/authRoutes');
+const movieRoutes=require('./routes/movieRoutes');
 require('dotenv').config();
 
 const app=express();
+
+const allowedOrigins = [
+  process.env.FRONTEND_URL,
+  'http://localhost:5173'
+].filter(Boolean);
+
+const corsOptions = {
+  origin: (origin, callback) => {
+    // Allow non-browser tools (Postman/curl) and approved frontend origins.
+    if (!origin || allowedOrigins.includes(origin)) {
+      return callback(null, true);
+    }
+    return callback(new Error('Not allowed by CORS'));
+  },
+  credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization']
+};
+
 app.use(express.json());
 app.use(cookieParser());
-app.use(cors({
-    origin:'*'
-}));
+app.use(cors(corsOptions));
 app.use(authRoutes);
+app.use(movieRoutes);
 
 mongoose
   .connect(process.env.MONGO_URL)
