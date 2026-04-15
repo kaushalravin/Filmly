@@ -1,20 +1,18 @@
 const mongoose=require('mongoose');
-const { create } = require('./movies');
-
 const userSchema=new mongoose.Schema({
     username:{
-        string:true,
+        type:String,
         required:true,
         unique:true,
         minlength:5,
         maxlength:75
     },
     email:{
-        type:string,
+        type:String,
         required:true
     },
     password:{
-        type:string,
+        type:String,
         required:true
     },
     createdAt:{

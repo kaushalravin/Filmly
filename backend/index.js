@@ -1,9 +1,18 @@
 const express=require('express');
 const mongoose=require('mongoose');
 const cors=require('cors');
+const cookieParser=require('cookie-parser');
+
+const authRoutes=require('./routes/authRoutes');
 require('dotenv').config();
 
 const app=express();
+app.use(express.json());
+app.use(cookieParser());
+app.use(cors({
+    origin:'*'
+}));
+app.use(authRoutes);
 
 mongoose
   .connect(process.env.MONGO_URL)
