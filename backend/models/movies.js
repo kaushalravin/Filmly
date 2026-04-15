@@ -1,0 +1,46 @@
+const mongoose=require('mongoose');
+
+const movieSchema=new mongoose.Schema({
+    tmdbId:{
+        type:Number,
+        required:true,
+        unique:true,
+        index:true
+    },
+    title:{
+        type:String,
+        required:true,
+        trim:true
+    },
+    overview:{
+        type:String,
+        default:''
+    },
+    genres:{
+        type:[String],
+        default:[]
+    },
+    posterPath:{
+        type:String,
+        default:''
+    },
+    trailerUrl:{
+        type:String,
+        default:''
+    },
+    releaseDate:{
+        type:Date
+    },
+    popularity:{
+        type:Number,
+        default:0
+    },
+    embedding:{
+        type:[Number],
+        default:[]
+    }
+},{
+    timestamps:true
+});
+
+module.exports=mongoose.model('Movie',movieSchema);
