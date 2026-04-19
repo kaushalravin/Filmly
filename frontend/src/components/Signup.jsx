@@ -3,7 +3,7 @@ import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import "../styles/login.css";
 
-const VITE_BACKEND_BASE = import.meta.env.VITE_BACKEND_BASE;
+const VITE_BACKEND_BASE = import.meta.env.VITE_BACKEND_BASE || import.meta.env.VITE_API_BASE || "";
 
 export default function Signup() {
     const navigate = useNavigate();

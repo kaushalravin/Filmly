@@ -1,18 +1,30 @@
 import axios from "axios";
-const VITE_API_BASE = import.meta.env.VITE_BACKEND_BASE || import.meta.env.VITE_API_BASE;
+const VITE_API_BASE =
+  import.meta.env.VITE_BACKEND_BASE ||
+  import.meta.env.VITE_API_BASE ||
+  "";
 axios.defaults.withCredentials = true;
 
 const TOKEN_KEY = "token";
 
-export function setAuthToken(token) {
-  try {
-    if (token) {
-      localStorage.setItem(TOKEN_KEY, token);
-      axios.defaults.headers.common.Authorization = `Bearer ${token}`;
-    }
-  } finally {
-    clearAuthCache();
+try {
+  const existingToken = localStorage.getItem(TOKEN_KEY);
+  if (existingToken) {
+    axios.defaults.headers.common.Authorization = `Bearer ${existingToken}`;
   }
+} catch {
+  // ignore storage access issues
+}
+
+export function setAuthToken(token) {
+  if (!token) return;
+
+  localStorage.setItem(TOKEN_KEY, token);
+  axios.defaults.headers.common.Authorization = `Bearer ${token}`;
+
+  // Mark auth as valid immediately to prevent stale unauthorized cache races.
+  cachedAuth = true;
+  cachedAt = Date.now();
 }
 
 export function clearAuthToken() {
@@ -35,7 +47,7 @@ export function clearAuthCache() {
 }
 
 export async function checkAuth({ force = false } = {}) {
-  if (!force && cachedAuth !== null && Date.now() - cachedAt < AUTH_CACHE_MS) {
+  if (!force && cachedAuth === true && Date.now() - cachedAt < AUTH_CACHE_MS) {
     return cachedAuth;
   }
 

@@ -5,14 +5,16 @@ const loginSchema = require('./authValidators').LoginSchema;
 const AppError = require('../utilities/AppError');
 
 const getTokenFromRequest = (req) => {
+    const authHeader = req.get("authorization") || req.get("Authorization");
+    if (authHeader) {
+        const match = String(authHeader).match(/^Bearer\s+(.+)$/i);
+        if (match) return match[1];
+    }
+
     const cookieToken = req?.cookies?.token;
     if (cookieToken) return cookieToken;
 
-    const authHeader = req.get("authorization") || req.get("Authorization");
-    if (!authHeader) return null;
-
-    const match = String(authHeader).match(/^Bearer\s+(.+)$/i);
-    return match ? match[1] : null;
+    return null;
 };
 
 const validateUser = (req, res, next) => {

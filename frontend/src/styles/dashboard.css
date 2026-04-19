@@ -1,0 +1,482 @@
+@import url('https://fonts.googleapis.com/css2?family=Sora:wght@400;500;600;700;800&family=Space+Grotesk:wght@500;600;700&display=swap');
+
+:root {
+  --filmly-bg-main: #070b11;
+  --filmly-bg-elev: #0f1620;
+  --filmly-bg-panel: #111a25;
+  --filmly-text-main: #eaf1fb;
+  --filmly-text-soft: #a9b7cb;
+  --filmly-border: rgba(157, 182, 214, 0.2);
+  --filmly-accent: #1ea7fd;
+  --filmly-accent-2: #ff7b4b;
+  --filmly-shadow: 0 20px 70px rgba(0, 0, 0, 0.45);
+}
+
+.filmly-dashboard-page {
+  position: relative;
+  min-height: 100vh;
+  padding: 32px 18px 40px;
+  overflow: hidden;
+  color: var(--filmly-text-main);
+  font-family: 'Sora', sans-serif;
+  background:
+    radial-gradient(circle at 12% 12%, rgba(30, 167, 253, 0.16), transparent 38%),
+    radial-gradient(circle at 88% 88%, rgba(255, 123, 75, 0.16), transparent 34%),
+    linear-gradient(160deg, #05080d 0%, #0a1119 48%, #070b11 100%);
+}
+
+.filmly-dashboard-page::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background-image: linear-gradient(rgba(255, 255, 255, 0.02) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.02) 1px, transparent 1px);
+  background-size: 52px 52px;
+  mask-image: linear-gradient(to bottom, rgba(0, 0, 0, 0.8), transparent 92%);
+  pointer-events: none;
+}
+
+.filmly-dashboard-glow {
+  position: absolute;
+  pointer-events: none;
+  width: 340px;
+  height: 340px;
+  border-radius: 50%;
+  filter: blur(82px);
+  opacity: 0.34;
+  animation: dashboard-drift 14s ease-in-out infinite;
+}
+
+.filmly-dashboard-glow-left {
+  left: -130px;
+  top: -100px;
+  background: #1ea7fd;
+}
+
+.filmly-dashboard-glow-right {
+  right: -140px;
+  bottom: -120px;
+  background: #ff7b4b;
+  animation-delay: -4s;
+}
+
+.filmly-dashboard-shell {
+  position: relative;
+  z-index: 1;
+  width: min(1220px, 100%);
+  margin: 0 auto;
+  display: grid;
+  gap: 22px;
+}
+
+.filmly-dashboard-header,
+.filmly-dashboard-hero,
+.filmly-dashboard-section {
+  border: 1px solid var(--filmly-border);
+  background: linear-gradient(145deg, rgba(17, 26, 37, 0.9), rgba(10, 16, 25, 0.94));
+  backdrop-filter: blur(10px);
+  box-shadow: var(--filmly-shadow);
+}
+
+.filmly-dashboard-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 18px;
+  padding: 22px 24px;
+  border-radius: 24px;
+  animation: dashboard-reveal 0.6s ease both;
+}
+
+.filmly-dashboard-header h1,
+.filmly-dashboard-hero h2,
+.filmly-dashboard-section h2,
+.filmly-dashboard-spotlight h3,
+.filmly-movie-title-row h3 {
+  margin: 0;
+  font-family: 'Space Grotesk', sans-serif;
+  letter-spacing: 0.01em;
+}
+
+.filmly-dashboard-header h1 {
+  margin-top: 8px;
+  font-size: clamp(1.7rem, 2.4vw, 2.4rem);
+  line-height: 1.05;
+  max-width: 10ch;
+}
+
+.filmly-dashboard-header p,
+.filmly-dashboard-hero p,
+.filmly-dashboard-section-head p,
+.filmly-movie-overview,
+.filmly-dashboard-spotlight p {
+  margin: 0;
+  color: var(--filmly-text-soft);
+  line-height: 1.65;
+}
+
+.filmly-dashboard-header p {
+  margin-top: 8px;
+  font-size: 0.98rem;
+}
+
+.filmly-dashboard-badge,
+.filmly-dashboard-eyebrow,
+.filmly-dashboard-spotlight-label {
+  display: inline-flex;
+  width: fit-content;
+  align-items: center;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: #dce9f8;
+}
+
+.filmly-dashboard-badge {
+  padding: 8px 14px;
+  border-radius: 999px;
+  border: 1px solid rgba(187, 209, 236, 0.3);
+}
+
+.filmly-dashboard-actions {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.filmly-dashboard-action,
+.filmly-movie-link {
+  border: 0;
+  cursor: pointer;
+  font-family: 'Space Grotesk', sans-serif;
+  font-weight: 600;
+  border-radius: 12px;
+  transition: transform 0.18s ease, filter 0.18s ease, background 0.18s ease;
+}
+
+.filmly-dashboard-action {
+  padding: 12px 16px;
+  min-width: 138px;
+}
+
+.filmly-dashboard-action.ghost {
+  color: #dce9f8;
+  border: 1px solid rgba(168, 191, 219, 0.34);
+  background: rgba(15, 26, 39, 0.68);
+}
+
+.filmly-dashboard-action.solid {
+  color: #f4f9ff;
+  background: linear-gradient(130deg, #1478c7, #1ea7fd 52%, #1a8ddd 100%);
+}
+
+.filmly-dashboard-action:hover,
+.filmly-movie-link:hover {
+  transform: translateY(-2px);
+  filter: brightness(1.06);
+}
+
+.filmly-spotlight-card {
+  display: grid;
+  grid-template-columns: 0.95fr 1.05fr;
+  gap: 18px;
+  align-items: center;
+  padding: 24px;
+  border-radius: 28px;
+  border: 1px solid var(--filmly-border);
+  background: linear-gradient(145deg, rgba(17, 26, 37, 0.9), rgba(10, 16, 25, 0.94));
+  backdrop-filter: blur(10px);
+  box-shadow: var(--filmly-shadow);
+  animation: dashboard-reveal 0.72s ease both;
+}
+
+.filmly-spotlight-copy {
+  display: grid;
+  gap: 14px;
+  justify-content: center;
+  align-content: center;
+  min-height: 100%;
+  padding-right: 10px;
+}
+
+.filmly-spotlight-copy h2 {
+  margin: 0;
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: clamp(1.6rem, 2.6vw, 2.4rem);
+  line-height: 1.08;
+  max-width: 10ch;
+}
+
+.filmly-spotlight-copy p {
+  margin: 0;
+  max-width: 34ch;
+  color: var(--filmly-text-soft);
+  line-height: 1.75;
+  font-size: 0.98rem;
+}
+
+.filmly-spotlight-media {
+  min-height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding-left: 6px;
+}
+
+.filmly-spotlight-poster {
+  width: 100%;
+  max-width: 560px;
+  aspect-ratio: 4 / 5;
+  object-fit: cover;
+  border-radius: 22px;
+  border: 1px solid rgba(157, 182, 214, 0.18);
+  box-shadow: 0 22px 44px rgba(0, 0, 0, 0.38);
+}
+
+.filmly-spotlight-poster.placeholder {
+  display: grid;
+  place-items: center;
+  aspect-ratio: 4 / 5;
+  border-radius: 22px;
+  border: 1px solid rgba(157, 182, 214, 0.18);
+  background: rgba(8, 14, 20, 0.55);
+  color: var(--filmly-text-soft);
+}
+
+.filmly-dashboard-spotlight-label {
+  color: #9fd4ff;
+}
+
+.filmly-dashboard-spotlight h3 {
+  font-size: clamp(1.15rem, 1.6vw, 1.5rem);
+  max-width: 100%;
+}
+
+.filmly-dashboard-section {
+  padding: 24px;
+  border-radius: 28px;
+  animation: dashboard-reveal 0.82s ease both;
+}
+
+.filmly-dashboard-section-head {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 18px;
+  margin-bottom: 18px;
+}
+
+.filmly-dashboard-section-head h2 {
+  margin-top: 8px;
+  font-size: clamp(1.35rem, 2vw, 1.8rem);
+}
+
+.filmly-dashboard-status {
+  border: 1px solid rgba(157, 182, 214, 0.18);
+  background: rgba(8, 14, 20, 0.5);
+  border-radius: 18px;
+  padding: 16px 18px;
+  color: var(--filmly-text-soft);
+  margin-bottom: 18px;
+}
+
+.filmly-dashboard-status.error {
+  color: #ffd3d2;
+  border-color: rgba(239, 83, 80, 0.36);
+  background: rgba(239, 83, 80, 0.12);
+}
+
+.filmly-dashboard-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 16px;
+}
+
+.filmly-movie-card {
+  overflow: hidden;
+  border-radius: 22px;
+  border: 1px solid rgba(157, 182, 214, 0.16);
+  background: linear-gradient(180deg, rgba(14, 20, 29, 0.96), rgba(9, 14, 20, 0.98));
+  box-shadow: 0 18px 40px rgba(0, 0, 0, 0.28);
+  transition: transform 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.filmly-movie-card:hover {
+  transform: translateY(-4px);
+  border-color: rgba(30, 167, 253, 0.34);
+  box-shadow: 0 24px 52px rgba(0, 0, 0, 0.36);
+}
+
+.filmly-movie-poster-wrap {
+  position: relative;
+  aspect-ratio: 16 / 12;
+  background: linear-gradient(145deg, rgba(30, 167, 253, 0.12), rgba(255, 123, 75, 0.08));
+}
+
+.filmly-movie-poster {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.filmly-movie-poster.placeholder {
+  display: grid;
+  place-items: center;
+  color: var(--filmly-text-soft);
+  font-size: 0.92rem;
+  letter-spacing: 0.04em;
+}
+
+.filmly-movie-chip {
+  position: absolute;
+  left: 14px;
+  top: 14px;
+  border-radius: 999px;
+  padding: 8px 11px;
+  background: rgba(7, 11, 17, 0.78);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  color: #eff7ff;
+  font-size: 0.78rem;
+  font-weight: 700;
+  backdrop-filter: blur(8px);
+}
+
+.filmly-movie-content {
+  padding: 18px;
+  display: grid;
+  gap: 14px;
+}
+
+.filmly-movie-title-row {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.filmly-movie-title-row h3 {
+  font-size: 1.05rem;
+  line-height: 1.3;
+}
+
+.filmly-movie-meta,
+.filmly-movie-popularity {
+  color: var(--filmly-text-soft);
+  font-size: 0.86rem;
+}
+
+.filmly-movie-overview {
+  font-size: 0.94rem;
+  line-height: 1.7;
+  min-height: 4.9em;
+}
+
+.filmly-movie-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.filmly-movie-link {
+  padding: 10px 14px;
+  color: #f4f9ff;
+  background: rgba(30, 167, 253, 0.16);
+  border: 1px solid rgba(30, 167, 253, 0.3);
+}
+
+@media (max-width: 1024px) {
+  .filmly-dashboard-header,
+  .filmly-dashboard-hero,
+  .filmly-dashboard-section-head,
+  .filmly-dashboard-section {
+    gap: 16px;
+  }
+
+  .filmly-dashboard-header,
+  .filmly-dashboard-section-head {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .filmly-dashboard-hero {
+    grid-template-columns: 1fr;
+    min-height: unset;
+  }
+
+  .filmly-dashboard-hero-copy {
+    padding-right: 0;
+  }
+
+  .filmly-spotlight-card {
+    grid-template-columns: 1fr;
+  }
+
+  .filmly-spotlight-copy {
+    padding-right: 0;
+  }
+
+  .filmly-spotlight-media {
+    padding-left: 0;
+  }
+
+  .filmly-dashboard-header h1 {
+    max-width: none;
+  }
+
+  .filmly-dashboard-stats,
+  .filmly-dashboard-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 640px) {
+  .filmly-dashboard-page {
+    padding: 16px 12px 26px;
+  }
+
+  .filmly-dashboard-header,
+  .filmly-dashboard-hero,
+  .filmly-dashboard-section {
+    padding: 18px;
+    border-radius: 22px;
+  }
+
+  .filmly-dashboard-stats,
+  .filmly-dashboard-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .filmly-dashboard-action {
+    width: 100%;
+  }
+
+  .filmly-dashboard-actions {
+    width: 100%;
+  }
+}
+
+@keyframes dashboard-reveal {
+  from {
+    opacity: 0;
+    transform: translateY(14px) scale(0.99);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes dashboard-drift {
+  0%,
+  100% {
+    transform: translateY(0) scale(1);
+  }
+
+  50% {
+    transform: translateY(22px) scale(1.05);
+  }
+}

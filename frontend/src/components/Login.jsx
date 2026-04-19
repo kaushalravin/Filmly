@@ -4,7 +4,7 @@ import { useNavigate, useLocation } from "react-router-dom";
 import "../styles/login.css";
 import { clearAuthCache, setAuthToken } from "../utilities/auth";
 
-const VITE_BACKEND_BASE = import.meta.env.VITE_BACKEND_BASE;
+const VITE_BACKEND_BASE = import.meta.env.VITE_BACKEND_BASE || import.meta.env.VITE_API_BASE || "";
 
 export default function Login() {
     const navigate = useNavigate();
