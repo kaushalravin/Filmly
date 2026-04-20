@@ -3,6 +3,7 @@ import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import { clearAuthToken } from "../utilities/auth";
 import Navbar from "./Navbar.jsx";
+import MovieCard from "./MovieCard.jsx";
 import "../styles/dashboard.css";
 
 const VITE_BACKEND_BASE = import.meta.env.VITE_BACKEND_BASE || import.meta.env.VITE_API_BASE || "";
@@ -109,36 +110,12 @@ export default function Dashboard() {
 
           <div className="filmly-dashboard-grid">
             {featuredMovies.map((movie, index) => {
-              const posterUrl = movie.posterPath ? `${TMDB_IMAGE_BASE}${movie.posterPath}` : "";
               return (
-                <article key={`${movie.tmdbId || movie.id || movie.title || "movie"}-${index}`} className="filmly-movie-card">
-                  <div className="filmly-movie-poster-wrap">
-                    {posterUrl ? (
-                      <img className="filmly-movie-poster" src={posterUrl} alt={movie.title} loading="lazy" />
-                    ) : (
-                      <div className="filmly-movie-poster placeholder">
-                        <span>No poster</span>
-                      </div>
-                    )}
-                    <div className="filmly-movie-chip">#{index + 1}</div>
-                  </div>
-
-                  <div className="filmly-movie-content">
-                    <div className="filmly-movie-title-row">
-                      <h3>{movie.title}</h3>
-                      <span className="filmly-movie-meta">{movie.releaseDate ? movie.releaseDate.slice(0, 4) : "TBA"}</span>
-                    </div>
-
-                    <p className="filmly-movie-overview">{movie.overview || "No description available."}</p>
-
-                    <div className="filmly-movie-footer">
-                      <span className="filmly-movie-popularity">Popularity {Number(movie.popularity || 0).toFixed(0)}</span>
-                      <button type="button" className="filmly-movie-link">
-                        View details
-                      </button>
-                    </div>
-                  </div>
-                </article>
+                <MovieCard
+                  key={`${movie.tmdbId || movie.id || movie.title || "movie"}-${index}`}
+                  movie={movie}
+                  index={index}
+                />
               );
             })}
           </div>

@@ -95,6 +95,7 @@ router.get('/api/movie/:tmdbId',wrapAsync(async(req,res)=>{
     const response2=await axios.get(`${process.env.TMDB_BASE_URL}movie/${tmdbId}`,{
         params:{
             api_key:process.env.TMDB_API_KEY,
+            append_to_response:'credits'
         }
     });
 
@@ -112,7 +113,17 @@ router.get('/api/movie/:tmdbId',wrapAsync(async(req,res)=>{
                 posterPath: e.poster_path,
                 releaseDate: e.release_date,
                 popularity: e.popularity,
-                trailer_url: `https://www.youtube.com/results?search_query=${encodeURIComponent(e.title + " official trailer")}`
+                cast: (e.credits?.cast || []).map((actor) => ({
+                    name: actor.name,
+                    posterPath: actor.profile_path,
+                    character: actor.character
+                })),
+                crew: (e.credits?.crew || []).map((member) => ({
+                    name: member.name,
+                    posterPath: member.profile_path,
+                    character: member.job || member.department || ""
+                })),
+                trailerUrl: `https://www.youtube.com/results?search_query=${encodeURIComponent(e.title + " official trailer")}`
             };
     
 

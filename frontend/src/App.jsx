@@ -4,6 +4,7 @@ import PublicOnlyRoute from "./components/PublicOnlyRoute.jsx";
 import Login from './components/Login.jsx';
 import Signup from './components/Signup.jsx';
 import Dashboard from './components/Dashboard.jsx';
+import Movie from './components/Movie.jsx';
 
 
 
@@ -18,6 +19,7 @@ function App() {
           <Route path='/auth/login' element={<Login/>}></Route>
           <Route path='/auth/signup' element={<PublicOnlyRoute><Signup/></PublicOnlyRoute>}></Route>
           <Route path='/dashboard' element={<ProtectedRoute><Dashboard/></ProtectedRoute>}></Route>
+          <Route path='/movie/:tmdbid' element={<ProtectedRoute><Movie/></ProtectedRoute>}></Route>
           <Route path='*' element={<Navigate to='/auth/login' replace />}></Route>
         </Routes>
       </BrowserRouter>

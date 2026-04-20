@@ -36,7 +36,8 @@ async function fetchMovie(){
                     include_adult: false,
                     'release_date.lte': new Date().toISOString().split('T')[0],
                     'vote_count.gte': 25,
-                    page: 1
+                    page: 1,
+                    append_to_response: 'credits'
                 }
             }),
             axios.get(url, {
@@ -48,7 +49,8 @@ async function fetchMovie(){
                     sort_by: 'popularity.desc',
                     include_adult: false,
                     'vote_count.gte': 15,
-                    page: 1
+                    page: 1,
+                    append_to_response: 'credits'
                 }
             }),
             axios.get(url, {
@@ -62,7 +64,8 @@ async function fetchMovie(){
                     include_adult: false,
                     'release_date.lte': new Date().toISOString().split('T')[0],
                     'vote_count.gte': 10,
-                    page: 1
+                    page: 1,
+                    append_to_response: 'credits'
                 }
             })
         ]);
@@ -92,7 +95,13 @@ async function fetchMovie(){
                 genres: (e.genre_ids || []).map(String),
                 posterPath: e.poster_path,
                 releaseDate: e.release_date,
-                popularity: e.popularity
+                popularity: e.popularity,
+                cast: (e.credits?.cast || []).map((actor) => ({
+                    name: actor.name,
+                    posterPath: actor.profile_path,
+                    character: actor.character
+                })),
+                trailerUrl: `https://www.youtube.com/results?search_query=${encodeURIComponent(e.title + " official trailer")}`
             };
             insertMovies.push(movie);
         });

@@ -28,6 +28,44 @@ const movieSchema=new mongoose.Schema({
         type:String,
         default:''
     },
+    cast:{
+        type:[{
+            name:{
+                type:String,
+                trim:true,
+                default:''
+            },
+            posterPath:{
+                type:String,
+                default:''
+            },
+            character:{
+                type:String,
+                trim:true,
+                default:''
+            }
+        }],
+        default:[]
+    },
+    crew:{
+        type:[{
+            name:{
+                type:String,
+                trim:true,
+                default:''
+            },
+            posterPath:{
+                type:String,
+                default:''
+            },
+            character:{
+                type:String,
+                trim:true,
+                default:''
+            }
+        }],
+        default:[]
+    },
     releaseDate:{
         type:Date
     },

@@ -1,0 +1,172 @@
+@import url('https://fonts.googleapis.com/css2?family=Sora:wght@400;500;600;700;800&family=Space+Grotesk:wght@500;600;700&display=swap');
+
+.filmly-review-section {
+  width: min(1320px, 100%);
+  margin: 0 auto;
+  border-radius: 28px;
+  border: 1px solid rgba(157, 182, 214, 0.2);
+  background: linear-gradient(145deg, rgba(17, 26, 37, 0.9), rgba(10, 16, 25, 0.94));
+  backdrop-filter: blur(10px);
+  box-shadow: 0 20px 70px rgba(0, 0, 0, 0.45);
+  padding: 30px;
+  display: grid;
+  gap: 20px;
+}
+
+.filmly-review-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 18px;
+}
+
+.filmly-review-header h2 {
+  margin: 8px 0 0;
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: clamp(1.8rem, 3vw, 2.8rem);
+  line-height: 1.15;
+  color: #eaf1fb;
+}
+
+.filmly-review-header p {
+  margin: 0;
+  color: #a9b7cb;
+  line-height: 1.6;
+  max-width: 34ch;
+  text-align: right;
+}
+
+.filmly-review-eyebrow {
+  display: inline-flex;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: #dce9f8;
+}
+
+.filmly-review-status {
+  border: 1px solid rgba(157, 182, 214, 0.18);
+  background: rgba(8, 14, 20, 0.5);
+  border-radius: 18px;
+  padding: 14px 16px;
+  color: #eaf1fb;
+}
+
+.filmly-review-form {
+  display: grid;
+  gap: 14px;
+  max-width: 100%;
+}
+
+.filmly-review-label {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  color: #dce9f8;
+  font-size: 1rem;
+  font-weight: 600;
+}
+
+.filmly-review-label span {
+  color: #95a7bf;
+  font-weight: 500;
+  font-size: 0.82rem;
+}
+
+.filmly-review-range-wrap {
+  display: grid;
+  gap: 8px;
+  max-width: 840px;
+}
+
+.filmly-review-range {
+  width: 100%;
+  accent-color: #1ea7fd;
+  height: 22px;
+}
+
+.filmly-review-rating-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  color: #a9b7cb;
+  font-size: 0.84rem;
+  max-width: 100%;
+}
+
+.filmly-review-rating-row strong {
+  color: #e9f3ff;
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 1rem;
+}
+
+.filmly-review-textarea {
+  width: 100%;
+  resize: vertical;
+  min-height: 170px;
+  border-radius: 18px;
+  border: 1px solid rgba(157, 182, 214, 0.18);
+  background: rgba(8, 14, 20, 0.5);
+  color: #eaf1fb;
+  padding: 14px 16px;
+  font: inherit;
+  line-height: 1.7;
+}
+
+.filmly-review-textarea::placeholder {
+  color: #70809a;
+}
+
+.filmly-review-textarea:focus {
+  outline: none;
+  border-color: rgba(30, 167, 253, 0.75);
+  box-shadow: 0 0 0 4px rgba(30, 167, 253, 0.15);
+}
+
+.filmly-review-submit {
+  width: fit-content;
+  border: 0;
+  cursor: pointer;
+  font-family: 'Space Grotesk', sans-serif;
+  font-weight: 600;
+  border-radius: 14px;
+  padding: 12px 18px;
+  color: #f4f9ff;
+  background: linear-gradient(130deg, #1478c7, #1ea7fd 52%, #1a8ddd 100%);
+  transition: transform 0.18s ease, filter 0.18s ease;
+}
+
+.filmly-review-submit:hover:not(:disabled) {
+  transform: translateY(-2px);
+  filter: brightness(1.06);
+}
+
+.filmly-review-submit:disabled {
+  opacity: 0.75;
+  cursor: not-allowed;
+}
+
+@media (max-width: 640px) {
+  .filmly-review-section {
+    width: 100%;
+    padding: 18px;
+    border-radius: 18px;
+  }
+
+  .filmly-review-header {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .filmly-review-submit {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .filmly-review-header p {
+    text-align: left;
+    max-width: none;
+  }
+}
