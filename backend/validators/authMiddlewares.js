@@ -3,6 +3,7 @@ const jwt = require('jsonwebtoken');
 const userSchema = require('./authValidators').signupSchema;
 const loginSchema = require('./authValidators').LoginSchema;
 const AppError = require('../utilities/AppError');
+const reviewModel = require('../models/reviews');
 
 const getTokenFromRequest = (req) => {
     const authHeader = req.get("authorization") || req.get("Authorization");
@@ -71,5 +72,34 @@ const isLoggedIn = (req, res, next) => {
 
 
 //isAuthorized has to come here
+const isAuthorized = async (req, res, next) => {
+    const token = getTokenFromRequest(req);
 
-module.exports = { validateUser, validateUserLogin, isLoggedIn };
+  if (!token) {
+    return next(new AppError("You are not authorized", 401));
+  }
+
+  try {
+    const payload = jwt.verify(token, process.env.JWT_SECRET);
+    const { id } = req.params;
+
+
+    const review = await reviewModel.findById(id);
+    if (!review) {
+      return next(new AppError("Review not found", 404));
+    }
+    
+    if (review.userId.toString() !== payload.id) {//always use return next(new...) in async middlewares
+      return next(new AppError("You are not authorized", 403));
+    }
+
+    req.user = payload;
+    next();
+
+  } catch (err) {
+    return next(new AppError("You are not authorized", 401));
+  }
+};
+
+
+module.exports = { validateUser, validateUserLogin, isLoggedIn ,isAuthorized};

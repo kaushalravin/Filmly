@@ -4,6 +4,7 @@ import { useNavigate, useParams } from "react-router-dom";
 import Navbar from "./Navbar.jsx";
 import AddReview from "./AddReview.jsx";
 import ShowReviews from "./showReviews.jsx";
+import UpdatePopup from "./UpdatePopup.jsx";
 import "../styles/Movie.css";
 
 const VITE_BACKEND_BASE = import.meta.env.VITE_BACKEND_BASE || import.meta.env.VITE_API_BASE || "";
@@ -58,6 +59,7 @@ export default function Movie({ tmdbId: propTmdbId }) {
     const [loading, setLoading] = useState(true);
     const [showAllPeople, setShowAllPeople] = useState(false);
     const [reviewRefreshKey, setReviewRefreshKey] = useState(0);
+    const [selectedReview, setSelectedReview] = useState(null);
 
     useEffect(() => {
         let cancelled = false;
@@ -135,7 +137,17 @@ export default function Movie({ tmdbId: propTmdbId }) {
     const previewCast = useMemo(() => normalizedMovie?.cast.slice(0, 6) || [], [normalizedMovie?.cast]);
     const peopleToShow = showAllPeople ? [...(normalizedMovie?.cast || [])] : [...previewCast];
 
+    const handleReviewPopupSave = (updatedReview) => {
+        setSelectedReview(null);
+        setReviewRefreshKey((prev) => prev + 1);
+    };
+
+    const handleReviewPopupClose = () => {
+        setSelectedReview(null);
+    };
+
     return (
+        <>
         <main className="filmly-movie-page">
             <Navbar onLogout={() => navigate("/auth/login", { replace: true })} />
 
@@ -264,8 +276,17 @@ export default function Movie({ tmdbId: propTmdbId }) {
 
             <div className="filmly-movie-review-wrap">
                 <AddReview tmdbId={tmdbId} onReviewAdded={() => setReviewRefreshKey((prev) => prev + 1)} />
-                <ShowReviews tmdbId={tmdbId} refreshKey={reviewRefreshKey} />
+                <ShowReviews tmdbId={tmdbId} refreshKey={reviewRefreshKey} onEditReview={setSelectedReview} />
             </div>
         </main>
+
+        {selectedReview && (
+            <UpdatePopup
+                review={selectedReview}
+                onClose={handleReviewPopupClose}
+                onSave={handleReviewPopupSave}
+            />
+        )}
+        </>
     );
 }

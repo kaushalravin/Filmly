@@ -1,7 +1,7 @@
 const express=require('express');
 const reviewModel=require('../models/reviews');
 const movieModel=require('../models/movies');
-const wrapAsync=require('../utilities/wrapAsync');
+const wrapAsync=require('../utilities/wrapAsync.js');
 const AppError=require('../utilities/AppError');
 const { isLoggedIn } = require('../validators/authMiddlewares');
 const { validateReview } = require('../validators/reviewMiddlewares');
@@ -44,6 +44,52 @@ router.get('/api/:tmdbId/reviews',wrapAsync(async(req,res)=>{
     res.json({
         success:true,
         data:reviews
+    });
+}));
+
+router.patch('/api/reviews/:reviewId',isLoggedIn,validateReview,wrapAsync(async(req,res)=>{
+    const {reviewId}=req.params;
+    const {rating,content}=req.body;
+    const review = await reviewModel.findById(reviewId);
+
+    if(!review){
+        throw new AppError("Review not found",404);
+    }
+
+    if (review.userId.toString() !== req.user.id) {
+        throw new AppError("You are not authorized", 403);
+    }
+
+    const updatedReview = await reviewModel.findByIdAndUpdate(
+        reviewId,
+        {rating,comment:content},
+        {new:true}
+    ).populate('userId','username');
+    
+    res.json({
+        success:true,
+        data:updatedReview,
+        message:"Review updated successfully"
+    });
+}));
+
+router.delete('/api/reviews/:reviewId',isLoggedIn,wrapAsync(async(req,res)=>{
+    const {reviewId}=req.params;
+    const review=await reviewModel.findById(reviewId);
+
+    if(!review){
+        throw new AppError("Review not found",404);
+    }
+
+    if (review.userId.toString() !== req.user.id) {
+        throw new AppError("You are not authorized", 403);
+    }   
+
+    await reviewModel.findByIdAndDelete(reviewId);
+
+    res.json({
+        success:true,
+        message:"Review deleted successfully"
     });
 }))
 

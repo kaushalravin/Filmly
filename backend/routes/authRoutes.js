@@ -2,7 +2,7 @@ const express=require('express');
 const bcrypt=require('bcrypt');
 const jwt=require('jsonwebtoken');
 const userModel=require('../models/users');
-const wrapAsync=require('../utilities/wrapAsync');
+const wrapAsync=require('../utilities/wrapAsync.js');
 const AppError=require('../utilities/AppError');
 const {isLoggedIn}=require('../validators/authMiddlewares');
 

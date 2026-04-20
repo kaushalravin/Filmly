@@ -1,7 +1,7 @@
 const express=require('express');
 const axios=require('axios');
 const movieModel=require('../models/movies');
-const wrapAsync=require('../utilities/wrapAsync');
+const wrapAsync=require('../utilities/wrapAsync.js');
 const AppError=require('../utilities/AppError');
 
 const router=express.Router();
@@ -117,11 +117,6 @@ router.get('/api/movie/:tmdbId',wrapAsync(async(req,res)=>{
                     name: actor.name,
                     posterPath: actor.profile_path,
                     character: actor.character
-                })),
-                crew: (e.credits?.crew || []).map((member) => ({
-                    name: member.name,
-                    posterPath: member.profile_path,
-                    character: member.job || member.department || ""
                 })),
                 trailerUrl: `https://www.youtube.com/results?search_query=${encodeURIComponent(e.title + " official trailer")}`
             };

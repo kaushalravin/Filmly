@@ -1,0 +1,186 @@
+.filmly-update-popup-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 80;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  overflow-y: auto;
+  background: rgba(2, 6, 12, 0.82);
+  backdrop-filter: blur(8px);
+}
+
+.filmly-update-popup {
+  position: relative;
+  z-index: 81;
+  width: min(680px, 100%);
+  max-height: calc(100vh - 40px);
+  overflow: auto;
+  border-radius: 26px;
+  border: 1px solid rgba(157, 182, 214, 0.2);
+  background: linear-gradient(145deg, rgba(17, 26, 37, 0.98), rgba(10, 16, 25, 0.98));
+  box-shadow: 0 28px 90px rgba(0, 0, 0, 0.6);
+  padding: 24px;
+  display: grid;
+  gap: 18px;
+  color: #eaf1fb;
+  font-family: 'Sora', sans-serif;
+}
+
+.filmly-update-popup-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 14px;
+}
+
+.filmly-update-popup-header h2 {
+  margin: 6px 0 0;
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: clamp(1.4rem, 2.5vw, 2rem);
+  line-height: 1.15;
+}
+
+.filmly-update-popup-eyebrow {
+  display: inline-flex;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: #dce9f8;
+}
+
+.filmly-update-popup-close {
+  width: 40px;
+  height: 40px;
+  border-radius: 999px;
+  border: 1px solid rgba(157, 182, 214, 0.18);
+  background: rgba(15, 26, 39, 0.72);
+  color: #eaf1fb;
+  cursor: pointer;
+  font-size: 1.5rem;
+  line-height: 1;
+}
+
+.filmly-update-popup-status {
+  border-radius: 16px;
+  border: 1px solid rgba(157, 182, 214, 0.18);
+  background: rgba(8, 14, 20, 0.5);
+  padding: 12px 14px;
+  color: #a9b7cb;
+}
+
+.filmly-update-popup-form {
+  display: grid;
+  gap: 14px;
+}
+
+.filmly-update-popup-label {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  color: #dce9f8;
+  font-size: 1rem;
+  font-weight: 600;
+}
+
+.filmly-update-popup-label span {
+  color: #95a7bf;
+  font-size: 0.82rem;
+  font-weight: 500;
+}
+
+.filmly-update-popup-range {
+  width: 100%;
+  accent-color: #1ea7fd;
+  height: 22px;
+}
+
+.filmly-update-popup-rating-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  color: #a9b7cb;
+  font-size: 0.84rem;
+}
+
+.filmly-update-popup-rating-row strong {
+  color: #e9f3ff;
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 1rem;
+}
+
+.filmly-update-popup-textarea {
+  width: 100%;
+  min-height: 180px;
+  resize: vertical;
+  border-radius: 18px;
+  border: 1px solid rgba(157, 182, 214, 0.18);
+  background: rgba(8, 14, 20, 0.5);
+  color: #eaf1fb;
+  padding: 14px 16px;
+  font: inherit;
+  line-height: 1.7;
+}
+
+.filmly-update-popup-textarea:focus {
+  outline: none;
+  border-color: rgba(30, 167, 253, 0.75);
+  box-shadow: 0 0 0 4px rgba(30, 167, 253, 0.15);
+}
+
+.filmly-update-popup-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.filmly-update-popup-secondary,
+.filmly-update-popup-primary {
+  border: 0;
+  cursor: pointer;
+  border-radius: 14px;
+  padding: 12px 16px;
+  font-family: 'Space Grotesk', sans-serif;
+  font-weight: 600;
+}
+
+.filmly-update-popup-secondary {
+  color: #eaf1fb;
+  background: rgba(15, 26, 39, 0.72);
+  border: 1px solid rgba(157, 182, 214, 0.18);
+}
+
+.filmly-update-popup-primary {
+  color: #f4f9ff;
+  background: linear-gradient(130deg, #1478c7, #1ea7fd 52%, #1a8ddd 100%);
+}
+
+.filmly-update-popup-primary:disabled {
+  opacity: 0.75;
+  cursor: not-allowed;
+}
+
+@media (max-width: 640px) {
+  .filmly-update-popup-backdrop {
+    padding: 12px;
+  }
+
+  .filmly-update-popup {
+    padding: 18px;
+    border-radius: 20px;
+    max-height: calc(100vh - 24px);
+  }
+
+  .filmly-update-popup-actions {
+    flex-direction: column;
+  }
+
+  .filmly-update-popup-secondary,
+  .filmly-update-popup-primary {
+    width: 100%;
+  }
+}

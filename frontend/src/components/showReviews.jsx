@@ -5,7 +5,7 @@ import "../styles/reviewCard.css";
 
 const VITE_BACKEND_BASE = import.meta.env.VITE_BACKEND_BASE || import.meta.env.VITE_API_BASE || "";
 
-export default function ShowReviews({ tmdbId, refreshKey = 0 }) {
+export default function ShowReviews({ tmdbId, refreshKey = 0, onEditReview }) {
     const [reviews, setReviews] = useState([]);
     const [loading, setLoading] = useState(true);
     const [message, setMessage] = useState("");
@@ -52,6 +52,49 @@ export default function ShowReviews({ tmdbId, refreshKey = 0 }) {
         isOwner: Boolean(currentUserId) && currentUserId === getAuthorId(review),
     })), [currentUserId, reviews]);
 
+    const updateReviewInState = (reviewId, updatedFields) => {
+        setReviews((currentReviews) => currentReviews.map((review) => {
+            const currentReviewId = review?._id || review?.id;
+            if (String(currentReviewId) !== String(reviewId)) {
+                return review;
+            }
+
+            return {
+                ...review,
+                ...updatedFields,
+            };
+        }));
+    };
+
+    const removeReviewFromState = (reviewId) => {
+        setReviews((currentReviews) => currentReviews.filter((review) => String(review?._id || review?.id) !== String(reviewId)));
+    };
+
+    const handleEdit = async (review) => {
+        if (onEditReview) {
+            onEditReview(review);
+        }
+    };
+
+    const handleDelete = async (review) => {
+        const reviewId = review?._id || review?.id;
+        if (!reviewId) return;
+
+        const shouldDelete = window.confirm("Delete this review?");
+        if (!shouldDelete) return;
+
+        try {
+            const response = await axios.delete(`${VITE_BACKEND_BASE}/api/reviews/${reviewId}`);
+
+            if (response.data?.success) {
+                removeReviewFromState(reviewId);
+            }
+        } catch (error) {
+            console.error("Error deleting review:", error);
+            window.alert(error?.response?.data?.message || "Failed to delete review");
+        }
+    };
+
     return (
         <section className="filmly-review-list-section">
             <div className="filmly-review-list-header">
@@ -73,8 +116,8 @@ export default function ShowReviews({ tmdbId, refreshKey = 0 }) {
                             key={review._id || review.id}
                             review={review}
                             isOwner={review.isOwner}
-                            onEdit={() => {}}
-                            onDelete={() => {}}
+                            onEdit={handleEdit}
+                            onDelete={handleDelete}
                         />
                     ))}
                 </div>
