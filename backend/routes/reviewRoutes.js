@@ -93,4 +93,18 @@ router.delete('/api/reviews/:reviewId',isLoggedIn,wrapAsync(async(req,res)=>{
     });
 }))
 
+router.get('/api/recent',isLoggedIn,wrapAsync(async(req,res)=>{
+    let user=req.user;
+    const reviews=await reviewModel.find({userId:user.id})
+        .populate('movieId','tmdbId title posterPath releaseDate overview genres')
+        .populate('userId','username')
+        .sort({createdAt:-1})
+        .limit(10);
+
+    res.json({
+        success:true,
+        data:reviews
+    });
+
+}))
 module.exports = router;

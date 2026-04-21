@@ -51,11 +51,19 @@ export default function Navbar() {
 
       <aside className={`filmly-navbar-drawer ${isOpen ? "open" : ""}`}>
         <nav className="filmly-navbar-menu" aria-label="Dashboard navigation">
-          {NAV_ITEMS.map((item) => (
-            <button key={item} type="button" className="filmly-navbar-item" onClick={() => setIsOpen(false)}>
-              {item}
-            </button>
-          ))}
+          {NAV_ITEMS.map((item) => {
+            const handleNavClick = () => {
+              setIsOpen(false);
+              if (item === "Recent watches") navigate("/recents");
+              if (item === "Recommendations") navigate("/recommendations");
+              if (item === "Profile") navigate("/profile");
+            };
+            return (
+              <button key={item} type="button" className="filmly-navbar-item" onClick={handleNavClick}>
+                {item}
+              </button>
+            );
+          })}
           <button
             type="button"
             className="filmly-navbar-item"
