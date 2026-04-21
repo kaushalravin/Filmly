@@ -1,7 +1,5 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
-import { useNavigate } from "react-router-dom";
-import { clearAuthToken } from "../utilities/auth";
 import Navbar from "./Navbar.jsx";
 import MovieCard from "./MovieCard.jsx";
 import "../styles/dashboard.css";
@@ -10,7 +8,6 @@ const VITE_BACKEND_BASE = import.meta.env.VITE_BACKEND_BASE || import.meta.env.V
 const TMDB_IMAGE_BASE = "https://image.tmdb.org/t/p/w500";
 
 export default function Dashboard() {
-  const navigate = useNavigate();
   const [trending, setTrending] = useState([]);
   const [loading, setLoading] = useState(true);
   const [msg, setMsg] = useState("");
@@ -50,21 +47,9 @@ export default function Dashboard() {
 
   const spotlightMovie = featuredMovies[0];
 
-  const handleLogout = async () => {
-    try {
-      await axios.post(`${VITE_BACKEND_BASE}/api/logout`);
-    } catch (error) {
-      // User should still be logged out on client even if server token is expired/invalid.
-      console.warn("Logout request failed, clearing local session:", error?.response?.status || error?.message);
-    } finally {
-      clearAuthToken();
-      navigate("/auth/login", { replace: true });
-    }
-  };
-
   return (
     <main className="filmly-dashboard-page">
-      <Navbar onLogout={handleLogout} />
+      <Navbar />
       <div className="filmly-dashboard-glow filmly-dashboard-glow-left" />
       <div className="filmly-dashboard-glow filmly-dashboard-glow-right" />
 

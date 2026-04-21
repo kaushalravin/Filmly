@@ -1,10 +1,26 @@
 import { useEffect, useState } from "react";
+import axios from "axios";
+import { useNavigate } from "react-router-dom";
+import { clearAuthToken } from "../utilities/auth";
 import "../styles/Navbar.css";
 
 const NAV_ITEMS = ["Profile", "Recent watches", "Recommendations", "Friends and family"];
+const VITE_BACKEND_BASE = import.meta.env.VITE_BACKEND_BASE || import.meta.env.VITE_API_BASE || "";
 
-export default function Navbar({ onLogout }) {
+export default function Navbar() {
   const [isOpen, setIsOpen] = useState(false);
+  const navigate = useNavigate();
+
+  const handleLogout = async () => {
+    try {
+      await axios.post(`${VITE_BACKEND_BASE}/api/logout`);
+    } catch (error) {
+      console.warn("Logout request failed, clearing local session:", error?.response?.status || error?.message);
+    } finally {
+      clearAuthToken();
+      navigate("/auth/login", { replace: true });
+    }
+  };
 
   useEffect(() => {
     const handleEsc = (event) => {
@@ -42,10 +58,20 @@ export default function Navbar({ onLogout }) {
           ))}
           <button
             type="button"
-            className="filmly-navbar-item logout"
+            className="filmly-navbar-item"
             onClick={() => {
               setIsOpen(false);
-              onLogout?.();
+              navigate("/search");
+            }}
+          >
+            Search
+          </button>
+          <button
+            type="button"
+            className="filmly-navbar-item logout"
+            onClick={async () => {
+              setIsOpen(false);
+              await handleLogout();
             }}
           >
             Logout

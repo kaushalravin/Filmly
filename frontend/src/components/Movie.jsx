@@ -149,7 +149,7 @@ export default function Movie({ tmdbId: propTmdbId }) {
     return (
         <>
         <main className="filmly-movie-page">
-            <Navbar onLogout={() => navigate("/auth/login", { replace: true })} />
+            <Navbar />
 
             <div className="filmly-movie-glow filmly-movie-glow-left" />
             <div className="filmly-movie-glow filmly-movie-glow-right" />
