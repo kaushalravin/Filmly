@@ -1,6 +1,8 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
 import Navbar from "./Navbar.jsx";
+import Favorites from "./Favorites.jsx";
+import WatchLater from "./watchLater.jsx";
 import Friends from "./Friends.jsx";
 import "../styles/profile.css";
 
@@ -83,6 +85,10 @@ export default function Profile() {
             </div>
           </section>
         )}
+
+        {!loading && profile && <Favorites />}
+
+        {!loading && profile && <WatchLater />}
 
         {!loading && profile && <Friends currentUserId={profile.id} />}
       </section>

@@ -406,6 +406,43 @@
   }
 }
 
+.filmly-movie-action-buttons {
+  display: flex;
+  gap: 12px;
+  margin-top: 16px;
+  flex-wrap: wrap;
+}
+
+.filmly-action-btn {
+  border: 1px solid rgba(157, 182, 214, 0.3);
+  background: linear-gradient(130deg, rgba(20, 120, 199, 0.8), rgba(30, 167, 253, 0.8));
+  color: #f4f9ff;
+  font-family: 'Space Grotesk', sans-serif;
+  font-weight: 600;
+  border-radius: 12px;
+  padding: 10px 16px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-size: 0.92rem;
+}
+
+.filmly-action-btn:hover:not(:disabled) {
+  background: linear-gradient(130deg, #1478c7, #1ea7fd);
+  border-color: rgba(157, 182, 214, 0.6);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(30, 167, 253, 0.3);
+}
+
+.filmly-action-btn.active {
+  background: linear-gradient(130deg, #ff7b4b 0%, #ff6b35 100%);
+  border-color: rgba(255, 123, 75, 0.6);
+}
+
+.filmly-action-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
 @keyframes movie-drift {
   0%,
   100% {

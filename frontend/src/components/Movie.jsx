@@ -60,6 +60,10 @@ export default function Movie({ tmdbId: propTmdbId }) {
     const [showAllPeople, setShowAllPeople] = useState(false);
     const [reviewRefreshKey, setReviewRefreshKey] = useState(0);
     const [selectedReview, setSelectedReview] = useState(null);
+    const [isFavorite, setIsFavorite] = useState(false);
+    const [isWatchLater, setIsWatchLater] = useState(false);
+    const [loadingFav, setLoadingFav] = useState(false);
+    const [loadingWL, setLoadingWL] = useState(false);
 
     useEffect(() => {
         let cancelled = false;
@@ -146,6 +150,34 @@ export default function Movie({ tmdbId: propTmdbId }) {
         setSelectedReview(null);
     };
 
+    const handleAddToFavorites = async () => {
+        if (!tmdbId) return;
+        setLoadingFav(true);
+        try {
+            await axios.post(`${VITE_BACKEND_BASE}/api/favorites/${tmdbId}`);
+            setIsFavorite(true);
+        } catch (err) {
+            console.error("Error adding to favorites:", err);
+            alert(err.response?.data?.message || "Failed to add to favorites");
+        } finally {
+            setLoadingFav(false);
+        }
+    };
+
+    const handleAddToWatchLater = async () => {
+        if (!tmdbId) return;
+        setLoadingWL(true);
+        try {
+            await axios.post(`${VITE_BACKEND_BASE}/api/watchLater/${tmdbId}`);
+            setIsWatchLater(true);
+        } catch (err) {
+            console.error("Error adding to watch later:", err);
+            alert(err.response?.data?.message || "Failed to add to watch later");
+        } finally {
+            setLoadingWL(false);
+        }
+    };
+
     return (
         <>
         <main className="filmly-movie-page">
@@ -215,6 +247,25 @@ export default function Movie({ tmdbId: propTmdbId }) {
                                     Watch trailer
                                 </a>
                             )}
+
+                            <div className="filmly-movie-action-buttons">
+                                <button
+                                    type="button"
+                                    className={`filmly-action-btn ${isFavorite ? 'active' : ''}`}
+                                    onClick={handleAddToFavorites}
+                                    disabled={loadingFav || isFavorite}
+                                >
+                                    {loadingFav ? 'Adding...' : isFavorite ? '❤ In Favorites' : '+ Add to Favorites'}
+                                </button>
+                                <button
+                                    type="button"
+                                    className={`filmly-action-btn ${isWatchLater ? 'active' : ''}`}
+                                    onClick={handleAddToWatchLater}
+                                    disabled={loadingWL || isWatchLater}
+                                >
+                                    {loadingWL ? 'Adding...' : isWatchLater ? '✓ In Watch Later' : '+ Add to Watch Later'}
+                                </button>
+                            </div>
                         </div>
 
                         <div className="filmly-movie-poster-wrap">

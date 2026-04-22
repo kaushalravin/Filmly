@@ -1,0 +1,55 @@
+.filmly-profile-section {
+  border: 1px solid rgba(157, 182, 214, 0.2);
+  background: linear-gradient(145deg, rgba(17, 26, 37, 0.9), rgba(10, 16, 25, 0.94));
+  backdrop-filter: blur(10px);
+  box-shadow: 0 20px 70px rgba(0, 0, 0, 0.45);
+  border-radius: 28px;
+  padding: 24px;
+}
+
+.filmly-profile-section-head {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 18px;
+  margin-bottom: 18px;
+}
+
+.filmly-profile-section-head h2 {
+  margin: 8px 0 0;
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 1.4rem;
+  color: #eaf1fb;
+}
+
+.filmly-profile-section-head p {
+  margin: 0;
+  color: #a9b7cb;
+  line-height: 1.6;
+}
+
+.filmly-profile-eyebrow {
+  display: inline-flex;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: #dce9f8;
+}
+
+.filmly-favorites-list {
+  display: grid;
+  gap: 18px;
+}
+
+@media (max-width: 768px) {
+  .filmly-profile-section {
+    padding: 18px;
+    border-radius: 22px;
+  }
+
+  .filmly-profile-section-head {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+}
