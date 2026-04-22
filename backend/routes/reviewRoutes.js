@@ -1,6 +1,7 @@
 const express=require('express');
 const reviewModel=require('../models/reviews');
 const movieModel=require('../models/movies');
+const friendModel=require('../models/friends');
 const wrapAsync=require('../utilities/wrapAsync.js');
 const AppError=require('../utilities/AppError');
 const { isLoggedIn } = require('../validators/authMiddlewares');
@@ -105,6 +106,65 @@ router.get('/api/recent',isLoggedIn,wrapAsync(async(req,res)=>{
         success:true,
         data:reviews
     });
-
 }))
+
+// Get all movies watched by friends
+router.get('/api/friends/movies',isLoggedIn,wrapAsync(async(req,res)=>{
+    const userId = req.user.id;
+    
+    // Get all accepted friends
+    const friends = await friendModel.find({
+        $or:[
+            {fromUserId:userId,status:'accepted'},
+            {toUserId:userId,status:'accepted'}
+        ]
+    });
+
+    // Extract friend IDs
+    const friendIds = friends.map(friend => {
+        return friend.fromUserId.toString() === userId 
+            ? friend.toUserId.toString() 
+            : friend.fromUserId.toString();
+    });
+
+    if(friendIds.length === 0){
+        return res.json({
+            success:true,
+            message:"No friends yet",
+            data:[]
+        });
+    }
+
+    // Get all reviews from friends
+    const reviews = await reviewModel.find({userId:{$in:friendIds}})
+        .populate('movieId','tmdbId title posterPath releaseDate overview genres')
+        .populate('userId','username')
+        .sort({createdAt:-1});
+
+    // Group movies by friend (optional - for better UX)
+    const moviesByFriend = {};
+    reviews.forEach(review => {
+        const friendUsername = review.userId.username;
+        if(!moviesByFriend[friendUsername]){
+            moviesByFriend[friendUsername] = [];
+        }
+        moviesByFriend[friendUsername].push({
+            movieId:review.movieId._id,
+            tmdbId:review.movieId.tmdbId,
+            title:review.movieId.title,
+            posterPath:review.movieId.posterPath,
+            overview:review.movieId.overview,
+            genres:review.movieId.genres,
+            rating:review.rating,
+            comment:review.comment
+        });
+    });
+
+    res.json({
+        success:true,
+        data:moviesByFriend,
+        totalMovies:reviews.length
+    });
+}))
+
 module.exports = router;

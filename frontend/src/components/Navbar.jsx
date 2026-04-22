@@ -4,7 +4,7 @@ import { useNavigate } from "react-router-dom";
 import { clearAuthToken } from "../utilities/auth";
 import "../styles/Navbar.css";
 
-const NAV_ITEMS = ["Profile", "Recent watches", "Recommendations", "Friends and family"];
+const NAV_ITEMS = ["Dashboard", "Profile", "Recent watches", "Recommendations", "Friends and family"];
 const VITE_BACKEND_BASE = import.meta.env.VITE_BACKEND_BASE || import.meta.env.VITE_API_BASE || "";
 
 export default function Navbar() {
@@ -54,8 +54,10 @@ export default function Navbar() {
           {NAV_ITEMS.map((item) => {
             const handleNavClick = () => {
               setIsOpen(false);
-              if (item === "Profile" || item === "Friends and family") navigate("/profile");
+              if (item === "Dashboard") navigate("/dashboard");
+              if (item === "Profile") navigate("/profile");
               if (item === "Recent watches") navigate("/recents");
+              if (item === "Friends and family") navigate("/friends-and-family");
               if (item === "Recommendations") navigate("/recommendations");
             };
             return (

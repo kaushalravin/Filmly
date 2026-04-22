@@ -8,6 +8,7 @@ import Movie from './components/Movie.jsx';
 import Search from './components/Search.jsx';
 import Recents from './components/Recents.jsx';
 import Profile from './components/Profile.jsx';
+import FriendsAndFamily from './components/friendsandfamily.jsx';
 
 
 
@@ -25,6 +26,7 @@ function App() {
           <Route path='/movie/:tmdbid' element={<ProtectedRoute><Movie/></ProtectedRoute>}></Route>
           <Route path='/search' element={<ProtectedRoute><Search/></ProtectedRoute>}></Route>
           <Route path='/recents' element={<ProtectedRoute><Recents/></ProtectedRoute>}></Route>
+          <Route path='/friends-and-family' element={<ProtectedRoute><FriendsAndFamily/></ProtectedRoute>}></Route>
           <Route path='/profile' element={<ProtectedRoute><Profile/></ProtectedRoute>}></Route>
           <Route path='*' element={<Navigate to='/auth/login' replace />}></Route>
         </Routes>
