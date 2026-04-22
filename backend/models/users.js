@@ -18,7 +18,15 @@ const userSchema=new mongoose.Schema({
     createdAt:{
         type:Date,
         default:Date.now
-    }  
+    },
+    friendCount:{
+        type:Number,
+        default:0
+    },
+    friendRequestsCount:{
+        type:Number,
+        default:0
+    }
 });
 
 const userModel=mongoose.model('User',userSchema);

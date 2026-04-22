@@ -54,9 +54,9 @@ export default function Navbar() {
           {NAV_ITEMS.map((item) => {
             const handleNavClick = () => {
               setIsOpen(false);
+              if (item === "Profile" || item === "Friends and family") navigate("/profile");
               if (item === "Recent watches") navigate("/recents");
               if (item === "Recommendations") navigate("/recommendations");
-              if (item === "Profile") navigate("/profile");
             };
             return (
               <button key={item} type="button" className="filmly-navbar-item" onClick={handleNavClick}>

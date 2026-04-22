@@ -6,6 +6,7 @@ const cookieParser=require('cookie-parser');
 const authRoutes=require('./routes/authRoutes');
 const movieRoutes=require('./routes/movieRoutes');
 const reviewRoutes=require('./routes/reviewRoutes');
+const friendRoutes=require('./routes/friendRoutes');
 require('dotenv').config();
 
 const app=express();
@@ -34,6 +35,7 @@ app.use(cors(corsOptions));
 app.use(authRoutes);
 app.use(movieRoutes);
 app.use(reviewRoutes);
+app.use(friendRoutes);
 
 mongoose
   .connect(process.env.MONGO_URL)

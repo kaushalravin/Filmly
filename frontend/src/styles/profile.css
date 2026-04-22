@@ -1,0 +1,208 @@
+@import url('https://fonts.googleapis.com/css2?family=Sora:wght@400;500;600;700;800&family=Space+Grotesk:wght@500;600;700&display=swap');
+
+.filmly-profile-page {
+  position: relative;
+  min-height: 100vh;
+  padding: 32px 18px 40px;
+  overflow: hidden;
+  color: #eaf1fb;
+  font-family: 'Sora', sans-serif;
+  background:
+    radial-gradient(circle at 12% 12%, rgba(30, 167, 253, 0.16), transparent 38%),
+    radial-gradient(circle at 88% 88%, rgba(255, 123, 75, 0.16), transparent 34%),
+    linear-gradient(160deg, #05080d 0%, #0a1119 48%, #070b11 100%);
+}
+
+.filmly-profile-page::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background-image: linear-gradient(rgba(255, 255, 255, 0.02) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.02) 1px, transparent 1px);
+  background-size: 52px 52px;
+  mask-image: linear-gradient(to bottom, rgba(0, 0, 0, 0.8), transparent 92%);
+  pointer-events: none;
+}
+
+.filmly-profile-glow {
+  position: absolute;
+  pointer-events: none;
+  width: 340px;
+  height: 340px;
+  border-radius: 50%;
+  filter: blur(82px);
+  opacity: 0.34;
+  animation: profile-drift 14s ease-in-out infinite;
+}
+
+.filmly-profile-glow-left {
+  left: -130px;
+  top: -100px;
+  background: #1ea7fd;
+}
+
+.filmly-profile-glow-right {
+  right: -140px;
+  bottom: -120px;
+  background: #ff7b4b;
+  animation-delay: -4s;
+}
+
+.filmly-profile-shell {
+  position: relative;
+  z-index: 1;
+  width: min(1220px, 100%);
+  margin: 0 auto;
+  display: grid;
+  gap: 22px;
+}
+
+.filmly-profile-header,
+.filmly-profile-card {
+  border: 1px solid rgba(157, 182, 214, 0.2);
+  background: linear-gradient(145deg, rgba(17, 26, 37, 0.9), rgba(10, 16, 25, 0.94));
+  backdrop-filter: blur(10px);
+  box-shadow: 0 20px 70px rgba(0, 0, 0, 0.45);
+  border-radius: 28px;
+  padding: 24px;
+}
+
+.filmly-profile-header {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 18px;
+}
+
+.filmly-profile-eyebrow {
+  display: inline-flex;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: #dce9f8;
+}
+
+.filmly-profile-header h1,
+.filmly-profile-copy h2 {
+  margin: 8px 0 0;
+  font-family: 'Space Grotesk', sans-serif;
+}
+
+.filmly-profile-header h1 {
+  font-size: clamp(1.7rem, 2.5vw, 2.4rem);
+  line-height: 1.06;
+}
+
+.filmly-profile-header p,
+.filmly-profile-copy p {
+  margin: 8px 0 0;
+  color: #a9b7cb;
+  line-height: 1.65;
+}
+
+.filmly-profile-badge {
+  padding: 14px 16px;
+  border-radius: 18px;
+  border: 1px solid rgba(157, 182, 214, 0.18);
+  background: rgba(8, 14, 20, 0.5);
+}
+
+.filmly-profile-badge span,
+.filmly-profile-stat span {
+  color: #a9b7cb;
+  display: block;
+}
+
+.filmly-profile-badge strong {
+  display: block;
+  margin-top: 6px;
+  font-family: 'Space Grotesk', sans-serif;
+}
+
+.filmly-profile-status {
+  border: 1px solid rgba(157, 182, 214, 0.18);
+  background: rgba(8, 14, 20, 0.5);
+  border-radius: 18px;
+  padding: 16px 18px;
+  color: #a9b7cb;
+}
+
+.filmly-profile-status.error {
+  color: #ffd3d2;
+  border-color: rgba(239, 83, 80, 0.36);
+  background: rgba(239, 83, 80, 0.12);
+}
+
+.filmly-profile-card {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 18px;
+  align-items: center;
+}
+
+.filmly-profile-avatar {
+  width: 96px;
+  height: 96px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 2rem;
+  font-weight: 700;
+  color: #eff7ff;
+  background: linear-gradient(145deg, rgba(30, 167, 253, 0.24), rgba(255, 123, 75, 0.18));
+  border: 1px solid rgba(157, 182, 214, 0.18);
+}
+
+.filmly-profile-stats {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+  margin-top: 16px;
+}
+
+.filmly-profile-stat {
+  padding: 14px 16px;
+  border-radius: 18px;
+  border: 1px solid rgba(157, 182, 214, 0.18);
+  background: rgba(8, 14, 20, 0.5);
+}
+
+.filmly-profile-stat strong {
+  display: block;
+  margin-top: 6px;
+  font-family: 'Space Grotesk', sans-serif;
+}
+
+@media (max-width: 768px) {
+  .filmly-profile-page {
+    padding: 16px 12px 26px;
+  }
+
+  .filmly-profile-header,
+  .filmly-profile-card {
+    padding: 18px;
+    border-radius: 22px;
+  }
+
+  .filmly-profile-header,
+  .filmly-profile-card {
+    grid-template-columns: 1fr;
+  }
+
+  .filmly-profile-stats {
+    grid-template-columns: 1fr;
+  }
+}
+
+@keyframes profile-drift {
+  0%,
+  100% {
+    transform: translateY(0) scale(1);
+  }
+
+  50% {
+    transform: translateY(22px) scale(1.05);
+  }
+}
