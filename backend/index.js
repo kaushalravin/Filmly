@@ -4,12 +4,12 @@ const cors=require('cors');
 const cookieParser=require('cookie-parser');
 const path=require('path');
 
+require('dotenv').config({ path: path.resolve(__dirname, '.env') });
+
 const authRoutes=require('./routes/authRoutes');
 const movieRoutes=require('./routes/movieRoutes');
 const reviewRoutes=require('./routes/reviewRoutes');
 const friendRoutes=require('./routes/friendRoutes');
-
-require('dotenv').config({ path: path.resolve(__dirname, '.env') });
 
 const port=process.env.PORT || 3000;
 const mongoUrl=process.env.MONGO_URL;

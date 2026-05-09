@@ -100,31 +100,58 @@ router.get('/api/movie/:tmdbId',wrapAsync(async(req,res)=>{
             append_to_response:'credits'
         }
     });
+    
 
     if(!response2 || response2.status!==200){
         throw new AppError("Failed to fetch movie details",500);
     }
 
     const e=response2.data;
-    
-        const movie = {
-                tmdbId: e.id,
-                title: e.title,
-                overview: e.overview,
-                genres: (e.genre_ids || []).map(String),
-                posterPath: e.poster_path,
-                releaseDate: e.release_date,
-                popularity: e.popularity,
-                cast: (e.credits?.cast || []).map((actor) => ({
-                    name: actor.name,
-                    posterPath: actor.profile_path,
-                    character: actor.character
-                })),
-                trailerUrl: `https://www.youtube.com/results?search_query=${encodeURIComponent(e.title + " official trailer")}`
-            };
-    
 
-    await movieModel.insertOne(movie, { ordered: false });
+    const movie = {
+        tmdbId: e.id,
+        title: e.title,
+        overview: e.overview,
+        genres: (e.genre_ids || []).map(String),
+        posterPath: e.poster_path,
+        releaseDate: e.release_date,
+        popularity: e.popularity,
+        cast: (e.credits?.cast || []).map((actor) => ({
+            name: actor.name,
+            posterPath: actor.profile_path,
+            character: actor.character
+        })),
+        trailerUrl: `https://www.youtube.com/results?search_query=${encodeURIComponent(e.title + " official trailer")}`
+    };
+
+    const aiServiceUrl = process.env.AI_SERVICE_URL;
+    if (!aiServiceUrl) {
+        throw new AppError('AI service URL is not configured', 500);
+    }
+
+    const embeddingText = [movie.title, movie.overview, movie.genres.join(', ')]
+        .filter(Boolean)
+        .join('. ');
+
+    let aiResponse;
+    try {
+        aiResponse = await axios.post(`${aiServiceUrl}/analyze`, {
+            text: embeddingText
+        });
+    } catch (error) {
+        console.error('[movie] AI service request failed:', error?.response?.data || error.message);
+        throw new AppError('Failed to add movie embeddings', 502);
+    }
+
+    if (!aiResponse?.data?.embedding) {
+        throw new AppError('Failed to add movie embeddings', 502);
+    }
+
+    movie.embedding = aiResponse.data.embedding;
+    console.log('embedding has been created for the movie', movie.tmdbId);
+
+    await movieModel.create(movie);
+
 
     res.json({
         success:true,
