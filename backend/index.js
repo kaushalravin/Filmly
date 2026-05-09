@@ -2,12 +2,17 @@ const express=require('express');
 const mongoose=require('mongoose');
 const cors=require('cors');
 const cookieParser=require('cookie-parser');
+const path=require('path');
 
 const authRoutes=require('./routes/authRoutes');
 const movieRoutes=require('./routes/movieRoutes');
 const reviewRoutes=require('./routes/reviewRoutes');
 const friendRoutes=require('./routes/friendRoutes');
-require('dotenv').config();
+
+require('dotenv').config({ path: path.resolve(__dirname, '.env') });
+
+const port=process.env.PORT || 3000;
+const mongoUrl=process.env.MONGO_URL;
 
 const app=express();
 
@@ -32,13 +37,19 @@ const corsOptions = {
 app.use(express.json());
 app.use(cookieParser());
 app.use(cors(corsOptions));
+
+app.use((req, res, next) => {
+  console.log(`[backend] ${req.method} ${req.originalUrl}`);
+  next();
+});
+
 app.use(authRoutes);
 app.use(movieRoutes);
 app.use(reviewRoutes);
 app.use(friendRoutes);
 
 mongoose
-  .connect(process.env.MONGO_URL)
+  .connect(mongoUrl)
   .then(() => {
     console.log("MongoDB connection successful!");
   })
@@ -51,6 +62,6 @@ app.get('/',(req,res)=>{
     res.send('hello world');
 });
 
-app.listen(process.env.PORT,()=>{
-    console.log(`server is running on port ${process.env.PORT}`);
+app.listen(port,()=>{
+  console.log(`server is running on port ${port}`);
 })

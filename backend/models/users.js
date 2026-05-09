@@ -39,7 +39,16 @@ const userSchema=new mongoose.Schema({
             type:mongoose.Schema.Types.ObjectId,
             ref:'Movie'
         }
-    ]
+    ],
+    profile_embedding:{
+        type:[Number],
+        default:[]
+    },
+    genre_preferences:{
+        type:Map,
+        of:Number,
+        default:{}
+    }
 });
 
 const userModel=mongoose.model('User',userSchema);

@@ -19,6 +19,10 @@ const reviewSchema=new mongoose.Schema({
     },
     comment:{
         type:String, 
+    },
+    embedding:{
+        type:[Number],
+        default:undefined
     }
     
 });
