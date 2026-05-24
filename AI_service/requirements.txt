@@ -45,4 +45,7 @@ transformers==5.7.0
 typer==0.25.1
 typing-inspection==0.4.2
 typing_extensions==4.15.0
+dnspython==2.7.0
+pymongo==4.13.2
+faiss-cpu
 uvicorn==0.46.0
