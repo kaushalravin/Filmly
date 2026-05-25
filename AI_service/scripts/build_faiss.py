@@ -1,12 +1,11 @@
 """Build a FAISS index from movies with embeddings.
 
 Usage examples:
-  python scripts/build_faiss.py --endpoint http://localhost:8000/movies --out-dir ./data
-  python scripts/build_faiss.py --out-dir ./data   # uses direct DB access
+    python scripts/build_faiss.py --endpoint http://localhost:8000/movies --out-dir ./data
+    python scripts/build_faiss.py --out-dir ./data   # uses direct DB access
 """
 import argparse
 import json
-import os
 from pathlib import Path
 import sys
 
@@ -89,6 +88,31 @@ def build_index(movies, out_dir: Path, normalize: bool = True):
     return index_path, meta_path, np_path
 
 
+def rebuild_faiss_index(out_dir: str = "./data", endpoint: str | None = None, normalize: bool = True):
+    """Fetch movies and rebuild the FAISS index on disk.
+
+    Returns a dict with output paths and counts.
+    """
+    if endpoint:
+        print(f"Fetching movies from endpoint: {endpoint}")
+        movies = fetch_movies_from_endpoint(endpoint)
+    else:
+        print("Fetching movies directly from MongoDB (app.db)")
+        movies = fetch_movies_from_db()
+
+    print(f"Found {len(movies)} movies (with embeddings filter applied by source)")
+
+    out_path = Path(out_dir)
+    idx_path, meta_path, np_path = build_index(movies, out_path, normalize=normalize)
+
+    return {
+        "count": len(movies),
+        "index_path": str(idx_path),
+        "meta_path": str(meta_path),
+        "embeddings_path": str(np_path),
+    }
+
+
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("--endpoint", help="AI service movies endpoint URL (e.g. http://localhost:8000/movies)")
@@ -96,22 +120,13 @@ def main():
     parser.add_argument("--no-normalize", dest="normalize", action="store_false", help="Disable L2 normalization (if you prefer)")
     args = parser.parse_args()
 
-    if args.endpoint:
-        print(f"Fetching movies from endpoint: {args.endpoint}")
-        movies = fetch_movies_from_endpoint(args.endpoint)
-    else:
-        print("Fetching movies directly from MongoDB (app.db)")
-        movies = fetch_movies_from_db()
-
-    print(f"Found {len(movies)} movies (with embeddings filter applied by source)")
-
-    out_dir = Path(args.out_dir)
-    idx_path, meta_path, np_path = build_index(movies, out_dir, normalize=args.normalize)
+    result = rebuild_faiss_index(out_dir=args.out_dir, endpoint=args.endpoint, normalize=args.normalize)
 
     print("FAISS index built:")
-    print(f" - index: {idx_path}")
-    print(f" - meta:  {meta_path}")
-    print(f" - numpy: {np_path}")
+    print(f" - count: {result['count']}")
+    print(f" - index: {result['index_path']}")
+    print(f" - meta:  {result['meta_path']}")
+    print(f" - numpy: {result['embeddings_path']}")
 
 
 if __name__ == "__main__":

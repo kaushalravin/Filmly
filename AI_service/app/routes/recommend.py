@@ -6,6 +6,8 @@ import numpy as np
 from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel
 
+from scripts.build_faiss import rebuild_faiss_index
+
 router = APIRouter()
 
 
@@ -81,3 +83,12 @@ def recommend(query: EmbeddingQuery):
         })
 
     return {"success": True, "k": len(results), "results": results}
+
+
+@router.post("/rebuild-index")
+def rebuild_index_now():
+    try:
+        result = rebuild_faiss_index(out_dir="./data")
+        return {"success": True, "message": "FAISS index rebuilt", "data": result}
+    except Exception as error:
+        raise HTTPException(status_code=500, detail=str(error))
