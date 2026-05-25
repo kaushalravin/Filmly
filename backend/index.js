@@ -10,6 +10,7 @@ const authRoutes=require('./routes/authRoutes');
 const movieRoutes=require('./routes/movieRoutes');
 const reviewRoutes=require('./routes/reviewRoutes');
 const friendRoutes=require('./routes/friendRoutes');
+const recommendationRoutes=require('./routes/recommendationRoutes');
 
 const port=process.env.PORT || 3000;
 const mongoUrl=process.env.MONGO_URL;
@@ -47,6 +48,7 @@ app.use(authRoutes);
 app.use(movieRoutes);
 app.use(reviewRoutes);
 app.use(friendRoutes);
+app.use(recommendationRoutes);
 
 mongoose
   .connect(mongoUrl)

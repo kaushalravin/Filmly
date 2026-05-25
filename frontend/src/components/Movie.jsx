@@ -103,6 +103,37 @@ export default function Movie({ tmdbId: propTmdbId }) {
         };
     }, [tmdbId]);
 
+    useEffect(() => {
+        let cancelled = false;
+
+        async function fetchUserMovieLists() {
+            if (!tmdbId) return;
+
+            try {
+                const [favoritesResponse, watchLaterResponse] = await Promise.all([
+                    axios.get(`${VITE_BACKEND_BASE}/api/favorites`),
+                    axios.get(`${VITE_BACKEND_BASE}/api/watchLater`),
+                ]);
+
+                if (cancelled) return;
+
+                const favoriteMovies = favoritesResponse.data?.data || [];
+                const watchLaterMovies = watchLaterResponse.data?.data || [];
+
+                setIsFavorite(favoriteMovies.some((item) => String(item.tmdbId) === String(tmdbId)));
+                setIsWatchLater(watchLaterMovies.some((item) => String(item.tmdbId) === String(tmdbId)));
+            } catch (error) {
+                console.warn("Failed to load favorite/watch later state:", error?.response?.status || error?.message);
+            }
+        }
+
+        fetchUserMovieLists();
+
+        return () => {
+            cancelled = true;
+        };
+    }, [tmdbId]);
+
     const posterUrl = useMemo(() => {
         if (!movie?.posterPath) return "";
         return `${TMDB_IMAGE_BASE}${movie.posterPath}`;
@@ -154,11 +185,16 @@ export default function Movie({ tmdbId: propTmdbId }) {
         if (!tmdbId) return;
         setLoadingFav(true);
         try {
-            await axios.post(`${VITE_BACKEND_BASE}/api/favorites/${tmdbId}`);
-            setIsFavorite(true);
+            if (isFavorite) {
+                await axios.delete(`${VITE_BACKEND_BASE}/api/favorites/${tmdbId}`);
+                setIsFavorite(false);
+            } else {
+                await axios.post(`${VITE_BACKEND_BASE}/api/favorites/${tmdbId}`);
+                setIsFavorite(true);
+            }
         } catch (err) {
-            console.error("Error adding to favorites:", err);
-            alert(err.response?.data?.message || "Failed to add to favorites");
+            console.error("Error updating favorites:", err);
+            alert(err.response?.data?.message || "Failed to update favorites");
         } finally {
             setLoadingFav(false);
         }
@@ -168,11 +204,16 @@ export default function Movie({ tmdbId: propTmdbId }) {
         if (!tmdbId) return;
         setLoadingWL(true);
         try {
-            await axios.post(`${VITE_BACKEND_BASE}/api/watchLater/${tmdbId}`);
-            setIsWatchLater(true);
+            if (isWatchLater) {
+                await axios.delete(`${VITE_BACKEND_BASE}/api/watchLater/${tmdbId}`);
+                setIsWatchLater(false);
+            } else {
+                await axios.post(`${VITE_BACKEND_BASE}/api/watchLater/${tmdbId}`);
+                setIsWatchLater(true);
+            }
         } catch (err) {
-            console.error("Error adding to watch later:", err);
-            alert(err.response?.data?.message || "Failed to add to watch later");
+            console.error("Error updating watch later:", err);
+            alert(err.response?.data?.message || "Failed to update watch later");
         } finally {
             setLoadingWL(false);
         }
@@ -253,17 +294,17 @@ export default function Movie({ tmdbId: propTmdbId }) {
                                     type="button"
                                     className={`filmly-action-btn ${isFavorite ? 'active' : ''}`}
                                     onClick={handleAddToFavorites}
-                                    disabled={loadingFav || isFavorite}
+                                    disabled={loadingFav}
                                 >
-                                    {loadingFav ? 'Adding...' : isFavorite ? '❤ In Favorites' : '+ Add to Favorites'}
+                                    {loadingFav ? 'Updating...' : isFavorite ? '❤ Remove from Favorites' : '+ Add to Favorites'}
                                 </button>
                                 <button
                                     type="button"
                                     className={`filmly-action-btn ${isWatchLater ? 'active' : ''}`}
                                     onClick={handleAddToWatchLater}
-                                    disabled={loadingWL || isWatchLater}
+                                    disabled={loadingWL}
                                 >
-                                    {loadingWL ? 'Adding...' : isWatchLater ? '✓ In Watch Later' : '+ Add to Watch Later'}
+                                    {loadingWL ? 'Updating...' : isWatchLater ? '✓ Remove from Watch Later' : '+ Add to Watch Later'}
                                 </button>
                             </div>
                         </div>

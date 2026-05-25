@@ -5,6 +5,7 @@ const userModel=require('../models/users');
 const wrapAsync=require('../utilities/wrapAsync.js');
 const AppError=require('../utilities/AppError');
 const isLoggedIn=require('../validators/authMiddlewares').isLoggedIn;
+const rebuildUserProfile=require('../utilities/rebuildUserProfile');
 
 const router=express.Router();
 
@@ -185,9 +186,43 @@ router.post('/api/favorites/:tmdbId',isLoggedIn,wrapAsync(async(req,res)=>{
 
     user.favorites.push(movie._id);
     await user.save();
+    await rebuildUserProfile(req.user.id);
     res.json({
         success:true,
         message:"Movie added to favorites successfully"
+    });
+}));
+
+router.delete('/api/favorites/:tmdbId',isLoggedIn,wrapAsync(async(req,res)=>{
+    const {tmdbId}=req.params;
+
+    if(!tmdbId || isNaN(tmdbId)){
+        throw new AppError("Invalid TMDB ID",400);
+    }
+
+    const movie=await movieModel.findOne({tmdbId:tmdbId});
+
+    if(!movie){
+        throw new AppError("Movie not found",404);
+    }
+
+    const user=await userModel.findById(req.user.id);
+    if(!user){
+        throw new AppError("User not found",404);
+    }
+
+    const hadFavorite = user.favorites.some((favoriteId) => favoriteId.toString() === movie._id.toString());
+    if(!hadFavorite){
+        throw new AppError("Movie is not in favorites",400);
+    }
+
+    user.favorites = user.favorites.filter((favoriteId) => favoriteId.toString() !== movie._id.toString());
+    await user.save();
+    await rebuildUserProfile(req.user.id);
+
+    res.json({
+        success:true,
+        message:"Movie removed from favorites successfully"
     });
 }));
 
@@ -213,9 +248,41 @@ router.post('/api/watchLater/:tmdbId',isLoggedIn,wrapAsync(async(req,res)=>{
     }
     user.watchlater.push(movie._id);
     await user.save();
+    await rebuildUserProfile(req.user.id);
     res.json({
         success:true,
         message:"Movie added to watch later successfully"
+    });
+}));
+
+router.delete('/api/watchLater/:tmdbId',isLoggedIn,wrapAsync(async(req,res)=>{
+    const {tmdbId}=req.params;
+    if(!tmdbId || isNaN(tmdbId)){
+        throw new AppError("Invalid TMDB ID",400);
+    }
+
+    const movie=await movieModel.findOne({tmdbId:tmdbId});
+    if(!movie){
+        throw new AppError("Movie not found",404);
+    }
+
+    const user=await userModel.findById(req.user.id);
+    if(!user){
+        throw new AppError("User not found",404);
+    }
+
+    const hasWatchLater = user.watchlater.some((movieId) => movieId.toString() === movie._id.toString());
+    if(!hasWatchLater){
+        throw new AppError("Movie is not in watch later",400);
+    }
+
+    user.watchlater = user.watchlater.filter((movieId) => movieId.toString() !== movie._id.toString());
+    await user.save();
+    await rebuildUserProfile(req.user.id);
+
+    res.json({
+        success:true,
+        message:"Movie removed from watch later successfully"
     });
 }));
 

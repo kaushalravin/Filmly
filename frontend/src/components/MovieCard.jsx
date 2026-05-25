@@ -29,7 +29,7 @@ const mapGenreLabel = (genre) => {
   return TMDB_GENRE_MAP[key] || key;
 };
 
-export default function MovieCard({ movie, index }) {
+export default function MovieCard({ movie, index, ctaLabel = "View details" }) {
   const navigate = useNavigate();
   const posterUrl = movie?.posterPath ? `${TMDB_IMAGE_BASE}${movie.posterPath}` : "";
   const movieId = movie?.tmdbId || movie?.id;
@@ -76,7 +76,7 @@ export default function MovieCard({ movie, index }) {
               navigate(`/movie/${movieId}`);
             }}
           >
-            View details
+            {ctaLabel}
           </button>
         </div>
       </div>

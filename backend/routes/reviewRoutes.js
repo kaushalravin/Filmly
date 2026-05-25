@@ -98,15 +98,34 @@ router.patch('/api/reviews/:reviewId',isLoggedIn,validateReview,wrapAsync(async(
     if (review.userId.toString() !== req.user.id) {
         throw new AppError("You are not authorized", 403);
     }
-    
 
-    const updatedReview = await reviewModel.findByIdAndUpdate(
-        reviewId,
-        {rating,comment:content},
-        {new:true}
-    ).populate('userId','username');
-    
-    // Rebuild user profile embedding
+    const aiServiceUrl = process.env.AI_SERVICE_URL;
+    if (!aiServiceUrl) {
+        throw new AppError('AI service URL is not configured', 500);
+    }
+
+    let result;
+    try {
+        result = await axios.post(`${aiServiceUrl}/analyze`, {
+            text: content
+        });
+    } catch (error) {
+        console.error('[reviews] AI service request failed during update:', error?.response?.data || error.message);
+        throw new AppError('Failed to generate embedding', 502);
+    }
+
+    if (!result?.data?.embedding) {
+        throw new AppError('Failed to generate embedding', 502);
+    }
+
+    review.rating = rating;
+    review.comment = content;
+    review.embedding = result.data.embedding;
+    await review.save();
+
+    const updatedReview = await reviewModel.findById(reviewId).populate('userId','username');
+
+    // Rebuild user profile embedding so it reflects the updated review embedding.
     await rebuildUserProfile(req.user.id);
 
     res.json({
@@ -188,6 +207,10 @@ router.get('/api/friends/movies',isLoggedIn,wrapAsync(async(req,res)=>{
     // Group movies by friend (optional - for better UX)
     const moviesByFriend = {};
     reviews.forEach(review => {
+        if (!review.userId || !review.movieId) {
+            return;
+        }
+
         const friendUsername = review.userId.username;
         if(!moviesByFriend[friendUsername]){
             moviesByFriend[friendUsername] = [];
