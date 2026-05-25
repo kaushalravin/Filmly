@@ -353,6 +353,28 @@
   gap: 18px;
 }
 
+.filmly-morelike-wrap {
+  width: min(1320px, 100%);
+  margin: 18px auto 0;
+  display: grid;
+}
+
+.filmly-morelike-wrap .filmly-morelike-section {
+  padding-top: 6px;
+}
+
+.filmly-morelike-wrap .filmly-morelike-header {
+  border-radius: 24px;
+}
+
+.filmly-morelike-wrap .filmly-morelike-grid {
+  margin-top: 2px;
+}
+
+.filmly-morelike-wrap .filmly-recommendations-status {
+  margin-top: 2px;
+}
+
 @media (max-width: 960px) {
   .filmly-movie-feature-card {
     grid-template-columns: 1fr;
@@ -403,6 +425,10 @@
   .filmly-movie-review-wrap {
     margin-top: 14px;
     gap: 14px;
+  }
+
+  .filmly-morelike-wrap {
+    margin-top: 14px;
   }
 }
 

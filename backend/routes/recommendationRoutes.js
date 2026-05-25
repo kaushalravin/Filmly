@@ -78,4 +78,40 @@ router.get('/api/recommendations',isLoggedIn,wrapAsync(async(req,res)=>{
     });
 }));
 
+router.get('/api/more-like-this/:tmdbId',isLoggedIn,wrapAsync(async(req,res)=>{
+    const {tmdbId}=req.params;
+    const movie=await movieModel.findOne({tmdbId:tmdbId});
+
+    if(!movie){
+        throw new AppError("Movie not found",404);
+    }
+
+    const embedding=movie.embedding;
+    if(!Array.isArray(embedding) || embedding.length === 0){
+        throw new AppError("Movie does not have a valid embedding",400);
+    }
+
+    const recommedations=await axios.post(`${AI_SERVICE_URL}/recommend`,{
+        embedding:embedding,
+        k:10
+    },{timeout:5000});
+    if(!recommedations || !recommedations.data || !Array.isArray(recommedations.data.results)){
+        throw new AppError("Failed to fetch recommendations",502);
+     }
+
+    const movieIds=recommedations.data.results
+        .map((e)=>e.movie_id)
+        .filter((movieId) => movieId && movieId.toString() !== movie._id.toString()); 
+
+    if(movieIds.length){
+        const movies=await movieModel.find({_id:{$in:movieIds}});
+        const movieMap = new Map(movies.map((movie) => [movie._id.toString(), movie]));
+        const orderedMovies = movieIds.map((movieId) => movieMap.get(movieId.toString())).filter(Boolean);
+        return res.json({
+            success:true,
+            data:orderedMovies
+        });
+     }
+}));
+
 module.exports=router;

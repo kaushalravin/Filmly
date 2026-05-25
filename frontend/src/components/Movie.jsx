@@ -5,6 +5,7 @@ import Navbar from "./Navbar.jsx";
 import AddReview from "./AddReview.jsx";
 import ShowReviews from "./showReviews.jsx";
 import UpdatePopup from "./UpdatePopup.jsx";
+import MoreLikeThis from "./MoreLikeThis.jsx";
 import "../styles/Movie.css";
 
 const VITE_BACKEND_BASE = import.meta.env.VITE_BACKEND_BASE || import.meta.env.VITE_API_BASE || "";
@@ -369,6 +370,10 @@ export default function Movie({ tmdbId: propTmdbId }) {
             <div className="filmly-movie-review-wrap">
                 <AddReview tmdbId={tmdbId} onReviewAdded={() => setReviewRefreshKey((prev) => prev + 1)} />
                 <ShowReviews tmdbId={tmdbId} refreshKey={reviewRefreshKey} onEditReview={setSelectedReview} />
+            </div>
+
+            <div className="filmly-morelike-wrap">
+                <MoreLikeThis tmdbId={tmdbId} />
             </div>
         </main>
 
