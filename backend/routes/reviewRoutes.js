@@ -162,8 +162,7 @@ router.get('/api/recent',isLoggedIn,wrapAsync(async(req,res)=>{
     const reviews=await reviewModel.find({userId:user.id})
         .populate('movieId','tmdbId title posterPath releaseDate overview genres')
         .populate('userId','username')
-        .sort({createdAt:-1})
-        .limit(10);
+        .sort({_id:-1});
 
     res.json({
         success:true,

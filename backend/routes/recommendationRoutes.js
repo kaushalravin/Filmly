@@ -536,4 +536,18 @@ router.post('/api/recommend/explain', isLoggedIn, wrapAsync(async (req, res) => 
     return res.json({ success: true, data: merged });
 }));
 
+//hero page route
+router.get('/api/hero',isLoggedIn,wrapAsync(async(req,res)=>{
+    const userid=req.id;
+
+    const user=await userModel.find({userId:userid});
+    let genres=user.genre_preferences;
+
+    let arr=[];
+    for(let i=0;i<genres.length;i++){
+        let movies=await movieModel.find({genres:genres[i]}).limit(5);
+        arr.push(...movies);
+    }
+}));
+
 module.exports=router;

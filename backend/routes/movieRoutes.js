@@ -2,6 +2,7 @@ const express=require('express');
 const axios=require('axios');
 const movieModel=require('../models/movies');
 const userModel=require('../models/users');
+const userActivityModel=require('../models/userActivity');
 const wrapAsync=require('../utilities/wrapAsync.js');
 const AppError=require('../utilities/AppError');
 const isLoggedIn=require('../validators/authMiddlewares').isLoggedIn;
@@ -9,15 +10,37 @@ const rebuildUserProfile=require('../utilities/rebuildUserProfile');
 
 const router=express.Router();
 
-router.get('/api/trending',wrapAsync((async(req,res)=>{
-    const response=await axios.get(`${process.env.TMDB_BASE_URL}trending/movie/week`,{
-        params:{
-            api_key:process.env.TMDB_API_KEY,
-        }
-    })
+const TMDB_TIMEOUT_MS = Number(process.env.TMDB_TIMEOUT_MS || 10000);
 
-    if(!response || response.status!==200){
-        throw new AppError("Failed to fetch trending movies",500);
+const getTmdbBaseUrl = () => {
+    const baseUrl = process.env.TMDB_BASE_URL || 'https://api.themoviedb.org/3/';
+    return baseUrl.endsWith('/') ? baseUrl : `${baseUrl}/`;
+};
+
+const fetchTmdb = async (path, params = {}) => {
+    try {
+        return await axios.get(`${getTmdbBaseUrl()}${path}`, {
+            timeout: TMDB_TIMEOUT_MS,
+            params: {
+                api_key: process.env.TMDB_API_KEY,
+                ...params,
+            },
+        });
+    } catch (error) {
+        console.error(`[tmdb] ${path} request failed:`, error?.code || error?.message);
+        return null;
+    }
+};
+
+router.get('/api/trending',wrapAsync((async(req,res)=>{
+    const response=await fetchTmdb('trending/movie/week');
+
+    if(!response || response.status!==200 || !Array.isArray(response.data?.results)){
+        console.warn('[trending] Falling back to an empty result set.');
+        return res.json({
+            success:true,
+            data:[]
+        });
     }
 
     const movies=response.data.results;
@@ -47,14 +70,11 @@ router.get('/api/search',wrapAsync(async(req,res)=>{
         throw new AppError("Invalid search query",400);
     }
     
-    const response=await axios.get(`${process.env.TMDB_BASE_URL}search/movie`,{
-        params:{
-            api_key:process.env.TMDB_API_KEY,
-            query:searchItem,
-        }
-    })
+    const response=await fetchTmdb('search/movie', {
+        query: searchItem,
+    });
 
-    if(!response || response.status!==200){
+    if(!response || response.status!==200 || !Array.isArray(response.data?.results)){
         throw new AppError("Failed to fetch search results",500);
     }
 
@@ -95,11 +115,8 @@ router.get('/api/movie/:tmdbId',wrapAsync(async(req,res)=>{
         });
     }
 
-    const response2=await axios.get(`${process.env.TMDB_BASE_URL}movie/${tmdbId}`,{
-        params:{
-            api_key:process.env.TMDB_API_KEY,
-            append_to_response:'credits'
-        }
+    const response2=await fetchTmdb(`movie/${tmdbId}`, {
+        append_to_response:'credits'
     });
     
 
@@ -186,6 +203,14 @@ router.post('/api/favorites/:tmdbId',isLoggedIn,wrapAsync(async(req,res)=>{
 
     user.favorites.push(movie._id);
     await user.save();
+    await userActivityModel.create({
+        userId: req.user.id,
+        action: 'favorite_added',
+        movieId: movie._id,
+        movieTitle: movie.title,
+        posterPath: movie.posterPath,
+        tmdbId: movie.tmdbId,
+    });
     await rebuildUserProfile(req.user.id);
     res.json({
         success:true,
@@ -218,6 +243,14 @@ router.delete('/api/favorites/:tmdbId',isLoggedIn,wrapAsync(async(req,res)=>{
 
     user.favorites = user.favorites.filter((favoriteId) => favoriteId.toString() !== movie._id.toString());
     await user.save();
+    await userActivityModel.create({
+        userId: req.user.id,
+        action: 'favorite_removed',
+        movieId: movie._id,
+        movieTitle: movie.title,
+        posterPath: movie.posterPath,
+        tmdbId: movie.tmdbId,
+    });
     await rebuildUserProfile(req.user.id);
 
     res.json({
@@ -248,6 +281,14 @@ router.post('/api/watchLater/:tmdbId',isLoggedIn,wrapAsync(async(req,res)=>{
     }
     user.watchlater.push(movie._id);
     await user.save();
+    await userActivityModel.create({
+        userId: req.user.id,
+        action: 'watchlater_added',
+        movieId: movie._id,
+        movieTitle: movie.title,
+        posterPath: movie.posterPath,
+        tmdbId: movie.tmdbId,
+    });
     await rebuildUserProfile(req.user.id);
     res.json({
         success:true,
@@ -278,6 +319,14 @@ router.delete('/api/watchLater/:tmdbId',isLoggedIn,wrapAsync(async(req,res)=>{
 
     user.watchlater = user.watchlater.filter((movieId) => movieId.toString() !== movie._id.toString());
     await user.save();
+    await userActivityModel.create({
+        userId: req.user.id,
+        action: 'watchlater_removed',
+        movieId: movie._id,
+        movieTitle: movie.title,
+        posterPath: movie.posterPath,
+        tmdbId: movie.tmdbId,
+    });
     await rebuildUserProfile(req.user.id);
 
     res.json({
