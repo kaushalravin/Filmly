@@ -10,6 +10,7 @@ import Recents from './components/Recents.jsx';
 import Profile from './components/Profile.jsx';
 import FriendsAndFamily from './components/friendsandfamily.jsx';
 import Recommendations from './components/Recommendations.jsx';
+import FriendProfile from './components/FriendProfile.jsx';
 
 
 
@@ -30,6 +31,7 @@ function App() {
           <Route path='/recommendations' element={<ProtectedRoute><Recommendations/></ProtectedRoute>}></Route>
           <Route path='/friends-and-family' element={<ProtectedRoute><FriendsAndFamily/></ProtectedRoute>}></Route>
           <Route path='/profile' element={<ProtectedRoute><Profile/></ProtectedRoute>}></Route>
+          <Route path='/friends/profile/:friendId' element={<ProtectedRoute><FriendProfile/></ProtectedRoute>}></Route>
           <Route path='*' element={<Navigate to='/auth/login' replace />}></Route>
         </Routes>
       </BrowserRouter>

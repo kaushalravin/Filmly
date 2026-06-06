@@ -1,0 +1,488 @@
+@import url('https://fonts.googleapis.com/css2?family=Sora:wght@400;500;600;700;800&family=Space+Grotesk:wght@500;600;700&display=swap');
+
+/* ── Design tokens (mirror dashboard) ───────────────────────── */
+:root {
+  --fp-bg-main:   #070b11;
+  --fp-bg-panel:  #111a25;
+  --fp-text-main: #eaf1fb;
+  --fp-text-soft: #a9b7cb;
+  --fp-border:    rgba(157, 182, 214, 0.2);
+  --fp-accent:    #1ea7fd;
+  --fp-accent-2:  #ff7b4b;
+  --fp-shadow:    0 20px 70px rgba(0, 0, 0, 0.45);
+}
+
+/* ── Page shell ──────────────────────────────────────────────── */
+.fp-page {
+  position: relative;
+  min-height: 100vh;
+  padding: 32px 18px 56px;
+  overflow: hidden;
+  color: var(--fp-text-main);
+  font-family: 'Sora', sans-serif;
+  background:
+    radial-gradient(circle at 14% 14%, rgba(30, 167, 253, 0.16), transparent 34%),
+    radial-gradient(circle at 86% 88%, rgba(255, 123, 75, 0.16), transparent 32%),
+    linear-gradient(160deg, #05080d 0%, #0a1119 50%, #070b11 100%);
+}
+
+.fp-page::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background-image:
+    linear-gradient(rgba(255,255,255,0.02) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255,255,255,0.02) 1px, transparent 1px);
+  background-size: 52px 52px;
+  mask-image: linear-gradient(to bottom, rgba(0,0,0,0.82), transparent 92%);
+  pointer-events: none;
+}
+
+/* ── Ambient glows ───────────────────────────────────────────── */
+.fp-glow {
+  position: absolute;
+  pointer-events: none;
+  width: 340px;
+  height: 340px;
+  border-radius: 50%;
+  filter: blur(82px);
+  opacity: 0.34;
+  animation: fp-drift 14s ease-in-out infinite;
+}
+
+.fp-glow-left  { left: -130px; top: -100px;    background: #1ea7fd; }
+.fp-glow-right { right: -140px; bottom: -120px; background: #ff7b4b; animation-delay: -4s; }
+
+/* ── Main layout shell ───────────────────────────────────────── */
+.fp-shell {
+  position: relative;
+  z-index: 1;
+  width: min(1240px, 100%);
+  margin: 0 auto;
+  display: grid;
+  gap: 16px;
+}
+
+/* ── Back button ─────────────────────────────────────────────── */
+.fp-back-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 10px 18px;
+  border-radius: 12px;
+  border: 1px solid var(--fp-border);
+  background: rgba(17, 26, 37, 0.72);
+  color: var(--fp-text-soft);
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  width: fit-content;
+  transition: background 0.18s ease, color 0.18s ease, transform 0.18s ease;
+  backdrop-filter: blur(10px);
+}
+
+.fp-back-btn:hover {
+  background: rgba(30, 167, 253, 0.14);
+  color: var(--fp-text-main);
+  transform: translateX(-3px);
+}
+
+/* ── Shared panel + hero border/bg ──────────────────────────── */
+.fp-hero,
+.fp-panel,
+.fp-status {
+  border: 1px solid var(--fp-border);
+  background: linear-gradient(145deg, rgba(17,26,37,0.92), rgba(10,16,25,0.96));
+  backdrop-filter: blur(10px);
+  box-shadow: var(--fp-shadow);
+}
+
+/* ── Hero ────────────────────────────────────────────────────── */
+.fp-hero {
+  display: grid;
+  grid-template-columns: 1.1fr 0.9fr;
+  gap: 20px;
+  padding: 26px;
+  border-radius: 30px;
+  animation: fp-reveal 0.6s ease both;
+}
+
+.fp-hero-copy {
+  display: grid;
+  gap: 16px;
+  align-content: center;
+}
+
+.fp-hero-copy h1 {
+  margin: 0;
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: clamp(2rem, 4vw, 3.4rem);
+  line-height: 0.98;
+  letter-spacing: 0.01em;
+}
+
+.fp-hero-copy p {
+  margin: 0;
+  color: var(--fp-text-soft);
+  font-size: 1rem;
+  line-height: 1.65;
+  max-width: 52ch;
+}
+
+.fp-hero-panel {
+  display: grid;
+  gap: 14px;
+  align-content: space-between;
+  padding: 22px;
+  border-radius: 24px;
+  border: 1px solid rgba(157, 182, 214, 0.16);
+  background:
+    linear-gradient(180deg, rgba(7,13,20,0.22), rgba(7,13,20,0.58)),
+    radial-gradient(circle at top right, rgba(30,167,253,0.22), transparent 48%),
+    rgba(8,14,20,0.55);
+}
+
+.fp-hero-panel h2 {
+  margin: 0;
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: clamp(1.35rem, 2.4vw, 2rem);
+  line-height: 1.08;
+  letter-spacing: 0.01em;
+}
+
+/* ── Quick stats inside hero panel ──────────────────────────── */
+.fp-stats-mini {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+
+.fp-stat-mini {
+  display: grid;
+  gap: 4px;
+  padding: 12px 14px;
+  border-radius: 16px;
+  background: rgba(8, 14, 20, 0.44);
+  border: 1px solid rgba(157, 182, 214, 0.12);
+}
+
+.fp-stat-mini span {
+  color: var(--fp-text-soft);
+  font-size: 0.76rem;
+  text-transform: uppercase;
+  letter-spacing: 0.16em;
+}
+
+.fp-stat-mini strong {
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 1.5rem;
+  line-height: 1;
+}
+
+/* ── Eyebrow label ───────────────────────────────────────────── */
+.fp-eyebrow {
+  display: inline-flex;
+  align-items: center;
+  letter-spacing: 0.24em;
+  text-transform: uppercase;
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: #dce9f8;
+}
+
+/* ── Feature grid (Favorites | Watch later) ──────────────────── */
+.fp-feature-grid,
+.fp-dual-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px;
+}
+
+/* ── Panel ───────────────────────────────────────────────────── */
+.fp-panel {
+  padding: 22px;
+  border-radius: 26px;
+  animation: fp-reveal 0.72s ease both;
+}
+
+.fp-section-head {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 18px;
+  margin-bottom: 18px;
+}
+
+.fp-section-head.compact {
+  margin-bottom: 14px;
+}
+
+.fp-section-head h2 {
+  margin: 8px 0 0;
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: clamp(1.2rem, 2vw, 1.7rem);
+  letter-spacing: 0.01em;
+}
+
+.fp-section-head p {
+  margin: 0;
+  color: var(--fp-text-soft);
+  font-size: 0.9rem;
+  line-height: 1.6;
+  max-width: 34ch;
+  text-align: right;
+}
+
+/* ── Horizontal movie strip ──────────────────────────────────── */
+.fp-strip {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 14px;
+}
+
+.fp-mini-card {
+  display: grid;
+  gap: 10px;
+  padding: 14px;
+  border-radius: 18px;
+  background: rgba(8, 14, 20, 0.44);
+  border: 1px solid rgba(157, 182, 214, 0.12);
+  transition: transform 0.18s ease, box-shadow 0.18s ease;
+}
+
+.fp-mini-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 12px 32px rgba(0,0,0,0.4);
+}
+
+.fp-mini-card-copy h3 {
+  margin: 0;
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 0.9rem;
+  line-height: 1.25;
+}
+
+.fp-mini-card-copy p {
+  margin: 6px 0 0;
+  color: var(--fp-text-soft);
+  font-size: 0.84rem;
+}
+
+/* ── Poster ──────────────────────────────────────────────────── */
+.fp-poster-wrap {
+  width: 100%;
+  aspect-ratio: 4 / 5;
+  border-radius: 14px;
+  overflow: hidden;
+}
+
+.fp-poster {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 14px;
+  border: 1px solid rgba(157, 182, 214, 0.14);
+}
+
+.fp-poster.placeholder,
+.fp-poster-wrap.placeholder {
+  display: grid;
+  place-items: center;
+  background: rgba(8, 14, 20, 0.55);
+  color: var(--fp-text-soft);
+  font-size: 0.8rem;
+}
+
+.fp-poster-wrap.list {
+  width: 68px;
+  min-width: 68px;
+  aspect-ratio: 4 / 5;
+}
+
+.fp-poster.list {
+  width: 68px;
+  min-width: 68px;
+}
+
+/* ── Reviews list ────────────────────────────────────────────── */
+.fp-list,
+.fp-activity-list {
+  display: grid;
+  gap: 12px;
+}
+
+.fp-list-item {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 14px;
+  align-items: start;
+  padding: 14px;
+  border-radius: 18px;
+  background: rgba(8, 14, 20, 0.44);
+  border: 1px solid rgba(157, 182, 214, 0.12);
+  transition: background 0.18s ease;
+}
+
+.fp-list-item:hover {
+  background: rgba(30, 167, 253, 0.06);
+}
+
+.fp-list-copy {
+  display: grid;
+  gap: 6px;
+}
+
+.fp-list-topline {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  align-items: start;
+}
+
+.fp-list-topline h3 {
+  margin: 0;
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 1rem;
+  line-height: 1.2;
+}
+
+.fp-list-topline span {
+  color: var(--fp-text-soft);
+  font-size: 0.88rem;
+  white-space: nowrap;
+}
+
+.fp-list-copy p {
+  margin: 0;
+  color: var(--fp-text-soft);
+  font-size: 0.9rem;
+  line-height: 1.55;
+}
+
+.fp-list-meta {
+  color: var(--fp-text-soft);
+  font-size: 0.82rem;
+}
+
+/* ── Activity list ───────────────────────────────────────────── */
+.fp-activity-item {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  gap: 12px;
+  align-items: start;
+  padding: 14px;
+  border-radius: 18px;
+  background: rgba(8, 14, 20, 0.44);
+  border: 1px solid rgba(157, 182, 214, 0.12);
+  transition: background 0.18s ease;
+}
+
+.fp-activity-item:hover {
+  background: rgba(255, 123, 75, 0.05);
+}
+
+.fp-activity-icon {
+  width: 40px;
+  height: 40px;
+  border-radius: 14px;
+  display: grid;
+  place-items: center;
+  background: linear-gradient(145deg, rgba(30,167,253,0.2), rgba(255,123,75,0.16));
+  border: 1px solid rgba(157, 182, 214, 0.16);
+  color: #dce9f8;
+}
+
+.fp-activity-item strong {
+  font-family: 'Space Grotesk', sans-serif;
+}
+
+.fp-activity-item p {
+  margin: 4px 0 0;
+  color: var(--fp-text-soft);
+  font-size: 0.88rem;
+  text-transform: capitalize;
+}
+
+.fp-activity-item > span {
+  color: var(--fp-text-soft);
+  font-size: 0.84rem;
+  white-space: nowrap;
+}
+
+/* ── Status / empty states ───────────────────────────────────── */
+.fp-status {
+  border-radius: 18px;
+  padding: 16px 18px;
+  border: 1px solid rgba(157, 182, 214, 0.18);
+  background: rgba(8, 14, 20, 0.5);
+  color: var(--fp-text-soft);
+}
+
+.fp-status.inline {
+  border: none;
+  background: transparent;
+  padding: 8px 0;
+  font-size: 0.9rem;
+}
+
+.fp-status.error {
+  color: #ffd3d2;
+  border-color: rgba(239, 83, 80, 0.36);
+  background: rgba(239, 83, 80, 0.12);
+}
+
+/* ── Responsive ──────────────────────────────────────────────── */
+@media (max-width: 1080px) {
+  .fp-hero,
+  .fp-feature-grid,
+  .fp-dual-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .fp-strip {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 840px) {
+  .fp-hero,
+  .fp-feature-grid,
+  .fp-dual-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .fp-strip {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .fp-section-head {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .fp-section-head p {
+    text-align: left;
+    max-width: none;
+  }
+}
+
+@media (max-width: 640px) {
+  .fp-page { padding: 16px 12px 32px; }
+  .fp-hero,
+  .fp-panel { padding: 18px; border-radius: 22px; }
+  .fp-strip { grid-template-columns: 1fr 1fr; }
+  .fp-list-item { grid-template-columns: 1fr; }
+  .fp-activity-item { grid-template-columns: auto 1fr; }
+}
+
+/* ── Animations ──────────────────────────────────────────────── */
+@keyframes fp-reveal {
+  from { opacity: 0; transform: translateY(14px) scale(0.99); }
+  to   { opacity: 1; transform: translateY(0)    scale(1);    }
+}
+
+@keyframes fp-drift {
+  0%,100% { transform: translateY(0)   scale(1);    }
+  50%      { transform: translateY(22px) scale(1.05); }
+}

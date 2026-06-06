@@ -29,11 +29,15 @@ const mapGenreLabel = (genre) => {
   return TMDB_GENRE_MAP[key] || key;
 };
 
+export { mapGenreLabel };
+
 export default function MovieCard({ movie, index, ctaLabel = "View details" }) {
   const navigate = useNavigate();
   const posterUrl = movie?.posterPath ? `${TMDB_IMAGE_BASE}${movie.posterPath}` : "";
   const movieId = movie?.tmdbId || movie?.id;
   const movieGenres = Array.isArray(movie?.genres) ? movie.genres.map(mapGenreLabel).filter(Boolean) : [];
+  const explanation = movie?.explanation;
+  const explanationSignals = Array.isArray(explanation?.signals) ? explanation.signals.filter(Boolean) : [];
 
   return (
     <article className="filmly-movie-card">
@@ -55,6 +59,22 @@ export default function MovieCard({ movie, index, ctaLabel = "View details" }) {
         </div>
 
         <p className="filmly-movie-overview">{movie?.overview || "No description available."}</p>
+
+        {explanation?.reason && (
+          <div className="filmly-movie-explanation" aria-label="Why this movie is recommended">
+            <span className="filmly-movie-explanation-label">Why it fits</span>
+            <p className="filmly-movie-explanation-text">{explanation.reason}</p>
+            {explanationSignals.length > 0 && (
+              <div className="filmly-movie-explanation-signals">
+                {explanationSignals.slice(0, 3).map((signal, signalIndex) => (
+                  <span key={`${signal}-${signalIndex}`} className="filmly-movie-explanation-signal">
+                    {signal}
+                  </span>
+                ))}
+              </div>
+            )}
+          </div>
+        )}
 
         {movieGenres.length > 0 && (
           <div className="filmly-movie-genres" aria-label="Movie genres">

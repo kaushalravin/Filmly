@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import "../styles/friends.css";
 
@@ -13,7 +14,8 @@ const getFriendUser = (friendship, currentUserId) => {
   return toUser || fromUser || null;
 };
 
-function FriendRow({ user, actionLabel, onAction, actionDisabled, actionTone = "solid" }) {
+function FriendRow({ user, friendshipId, actionLabel, onAction, actionDisabled, actionTone = "solid" }) {
+  const navigate = useNavigate();
   return (
     <article className="filmly-friend-row">
       <div className="filmly-friend-row-avatar">{(user?.username || "?").slice(0, 1).toUpperCase()}</div>
@@ -23,9 +25,18 @@ function FriendRow({ user, actionLabel, onAction, actionDisabled, actionTone = "
         <p>{user?.email || "Movie buddy"}</p>
       </div>
 
-      <button type="button" className={`filmly-friend-row-action ${actionTone}`} onClick={onAction} disabled={actionDisabled}>
-        {actionLabel}
-      </button>
+      <div className="filmly-friend-row-actions">
+        <button
+          type="button"
+          className="filmly-friend-row-action solid"
+          onClick={() => navigate(`/friends/profile/${friendshipId}`)}
+        >
+          View Profile
+        </button>
+        <button type="button" className={`filmly-friend-row-action ${actionTone}`} onClick={onAction} disabled={actionDisabled}>
+          {actionLabel}
+        </button>
+      </div>
     </article>
   );
 }
@@ -278,6 +289,7 @@ export default function Friends({ currentUserId }) {
               <FriendRow
                 key={id}
                 user={user}
+                friendshipId={id}
                 actionLabel="Unfriend"
                 actionTone="ghost"
                 actionDisabled={busyId === id}

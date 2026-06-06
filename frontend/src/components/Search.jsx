@@ -12,6 +12,7 @@ export default function Search() {
   const [message, setMessage] = useState("");
   const [loading, setLoading] = useState(false);
   const [hasSearched, setHasSearched] = useState(false);
+  const [searchMode, setSearchMode] = useState("normal");
 
   const handleSearch = async (event) => {
     event.preventDefault();
@@ -29,17 +30,25 @@ export default function Search() {
       setHasSearched(true);
       setMessage("");
 
-      const response = await axios.get(`${VITE_BACKEND_BASE}/api/search`, {
-        params: {
-          searchItem: query,
-        },
-      });
+      const isSemantic = searchMode === "semantic";
+      const response = await axios.get(
+        `${VITE_BACKEND_BASE}${isSemantic ? "/api/semantic-search" : "/api/search"}`,
+        {
+          params: isSemantic
+            ? {
+                query,
+              }
+            : {
+                searchItem: query,
+              },
+        }
+      );
 
       setSearchResults(response?.data?.data || []);
     } catch (error) {
       console.error("Error fetching search results:", error);
       setSearchResults([]);
-      setMessage("Failed to fetch search results. Please try again later.");
+      setMessage(error?.response?.data?.message || "Failed to fetch search results. Please try again later.");
     } finally {
       setLoading(false);
     }
@@ -56,22 +65,52 @@ export default function Search() {
           <div>
             <span className="filmly-search-eyebrow">Discover</span>
             <h1>Search movies.</h1>
-            <p>Find titles and explore details instantly.</p>
+            <p>Find titles with either exact keyword search or semantic movie understanding.</p>
           </div>
 
           <form className="filmly-search-form" onSubmit={handleSearch}>
+            <div className="filmly-search-mode-label">Search mode</div>
+            <div className="filmly-search-mode-switch" role="tablist" aria-label="Search mode">
+              <button
+                type="button"
+                className={`filmly-search-mode-button ${searchMode === "normal" ? "active" : ""}`}
+                onClick={() => setSearchMode("normal")}
+              >
+                <span className="filmly-search-mode-button-title">Normal</span>
+                <span className="filmly-search-mode-button-subtitle">Exact title match</span>
+              </button>
+              <button
+                type="button"
+                className={`filmly-search-mode-button ${searchMode === "semantic" ? "active" : ""}`}
+                onClick={() => setSearchMode("semantic")}
+              >
+                <span className="filmly-search-mode-button-title">Semantic</span>
+                <span className="filmly-search-mode-button-subtitle">Meaning-based search</span>
+              </button>
+            </div>
+
             <input
               type="text"
-              placeholder="Try Dune, Interstellar, Parasite..."
+              placeholder={
+                searchMode === "semantic"
+                  ? "Describe the kind of movie you want..."
+                  : "Try Dune, Interstellar, Parasite..."
+              }
               value={searchTerm}
               onChange={(event) => setSearchTerm(event.target.value)}
               aria-label="Search movies"
             />
             <button type="submit" disabled={loading}>
-              {loading ? "Searching..." : "Search"}
+              {loading ? "Searching..." : searchMode === "semantic" ? "Semantic search" : "Search"}
             </button>
           </form>
         </section>
+
+        <div className="filmly-search-tip">
+          {searchMode === "semantic"
+            ? "Semantic search understands the meaning of your query, not just exact words."
+            : "Normal search matches movie titles directly."}
+        </div>
 
         {message && <div className="filmly-search-status error">{message}</div>}
         {loading && <div className="filmly-search-status">Loading search results...</div>}

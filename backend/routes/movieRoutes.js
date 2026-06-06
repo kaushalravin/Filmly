@@ -32,37 +32,63 @@ const fetchTmdb = async (path, params = {}) => {
     }
 };
 
-router.get('/api/trending',wrapAsync((async(req,res)=>{
-    const response=await fetchTmdb('trending/movie/week');
+router.get('/api/trending', wrapAsync(async (req, res) => {
+    const page = Math.min(10, Math.max(1, parseInt(req.query.page, 10) || 1));
+    const limit = Math.min(30, Math.max(1, parseInt(req.query.limit, 10) || 20));
+    const response = await fetchTmdb('trending/movie/week', { page });
 
-    if(!response || response.status!==200 || !Array.isArray(response.data?.results)){
-        console.warn('[trending] Falling back to an empty result set.');
+    if (response && response.status === 200 && Array.isArray(response.data?.results)) {
+        const finalMovies = response.data.results.map((e) => ({
+            tmdbId: e.id,
+            title: e.title,
+            overview: e.overview,
+            genres: (e.genre_ids || []).map(String),
+            releaseDate: e.release_date,
+            posterPath: e.poster_path,
+            popularity: e.popularity,
+        }));
+
         return res.json({
-            success:true,
-            data:[]
+            success: true,
+            data: finalMovies,
+            page,
+            totalPages: Math.min(response.data.total_pages || 1, 10),
+            source: 'tmdb',
         });
     }
 
-    const movies=response.data.results;
-    let finalMovies=[];
+    console.warn('[trending] TMDB unavailable, falling back to paginated DB results.');
 
-    movies.map((e)=>{
-        const toStore={};
-        toStore.tmdbId=e.id;
-        toStore.title=e.title;
-        toStore.overview=e.overview;
-        toStore.genres=(e.genre_ids || []).map(String);
-        toStore.releaseDate=e.release_date;
-        toStore.posterPath=e.poster_path;
-        toStore.popularity=e.popularity;
-        finalMovies.push(toStore);
-    });
+    const skip = (page - 1) * limit;
+    const [totalCount, fallbackMovies] = await Promise.all([
+        movieModel.countDocuments({}),
+        movieModel
+            .find({})
+            .sort({ popularity: -1, _id: -1 })
+            .skip(skip)
+            .limit(limit)
+            .lean(),
+    ]);
 
-    res.json({
-        success:true,
-        data:finalMovies
+    const totalPages = Math.max(1, Math.ceil(totalCount / limit));
+    const data = fallbackMovies.map((movie) => ({
+        tmdbId: movie.tmdbId,
+        title: movie.title,
+        overview: movie.overview,
+        genres: Array.isArray(movie.genres) ? movie.genres : [],
+        releaseDate: movie.releaseDate,
+        posterPath: movie.posterPath,
+        popularity: movie.popularity,
+    }));
+
+    return res.json({
+        success: true,
+        data,
+        page,
+        totalPages,
+        source: 'db-fallback',
     });
-})));
+}));
 
 router.get('/api/search',wrapAsync(async(req,res)=>{
    const searchItem=req.query.searchItem;

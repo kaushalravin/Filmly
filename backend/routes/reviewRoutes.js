@@ -70,19 +70,31 @@ router.post('/api/:tmdbId/reviews',isLoggedIn,validateReview,wrapAsync(async(req
     });
 }));
 
-router.get('/api/:tmdbId/reviews',wrapAsync(async(req,res)=>{
-    const {tmdbId}=req.params;
-    const movie=await movieModel.findOne({tmdbId:tmdbId});
+router.get('/api/:tmdbId/reviews', wrapAsync(async (req, res) => {
+    const { tmdbId } = req.params;
+    const page  = Math.max(1, parseInt(req.query.page)  || 1);
+    const limit = Math.min(50, Math.max(1, parseInt(req.query.limit) || 5));
+    const skip  = (page - 1) * limit;
 
-    if(!movie){
-        throw new AppError("Movie not found",404);
-    }   
+    const movie = await movieModel.findOne({ tmdbId });
+    if (!movie) throw new AppError("Movie not found", 404);
 
-    const reviews=await reviewModel.find({movieId:movie._id}).populate('userId','username');
+    const [reviews, total] = await Promise.all([
+        reviewModel
+            .find({ movieId: movie._id })
+            .populate('userId', 'username')
+            .sort({ _id: -1 })
+            .skip(skip)
+            .limit(limit),
+        reviewModel.countDocuments({ movieId: movie._id }),
+    ]);
 
     res.json({
-        success:true,
-        data:reviews
+        success:    true,
+        data:       reviews,
+        page,
+        totalPages: Math.ceil(total / limit),
+        total,
     });
 }));
 

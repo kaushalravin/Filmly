@@ -1,22 +1,22 @@
-const express=require('express');
-const mongoose=require('mongoose');
-const cors=require('cors');
-const cookieParser=require('cookie-parser');
-const path=require('path');
+const express = require('express');
+const mongoose = require('mongoose');
+const cors = require('cors');
+const cookieParser = require('cookie-parser');
+const path = require('path');
 
 require('dotenv').config({ path: path.resolve(__dirname, '.env') });
 
-const authRoutes=require('./routes/authRoutes');
-const movieRoutes=require('./routes/movieRoutes');
-const reviewRoutes=require('./routes/reviewRoutes');
-const friendRoutes=require('./routes/friendRoutes');
-const recommendationRoutes=require('./routes/recommendationRoutes');
-const dashboardRoutes=require('./routes/dashboardRoutes');
+const authRoutes = require('./routes/authRoutes');
+const movieRoutes = require('./routes/movieRoutes');
+const reviewRoutes = require('./routes/reviewRoutes');
+const friendRoutes = require('./routes/friendRoutes');
+const recommendationRoutes = require('./routes/recommendationRoutes');
+const dashboardRoutes = require('./routes/dashboardRoutes');
 
-const port=process.env.PORT || 3000;
-const mongoUrl=process.env.MONGO_URL;
+const port = process.env.PORT || 3000;
+const mongoUrl = process.env.MONGO_URL;
 
-const app=express();
+const app = express();
 
 const allowedOrigins = [
   process.env.FRONTEND_URL,
@@ -62,10 +62,10 @@ mongoose
   });
 
 
-app.get('/',(req,res)=>{
-    res.send('hello world');
+app.get('/', (req, res) => {
+  res.send('hello world');
 });
 
-app.listen(port,()=>{
+app.listen(port, () => {
   console.log(`server is running on port ${port}`);
 })

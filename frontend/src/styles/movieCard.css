@@ -82,6 +82,52 @@
   min-height: 4.9em;
 }
 
+.filmly-movie-explanation {
+  display: grid;
+  gap: 10px;
+  padding: 14px 14px 12px;
+  border-radius: 16px;
+  border: 1px solid rgba(255, 123, 75, 0.18);
+  background: linear-gradient(145deg, rgba(255, 123, 75, 0.1), rgba(30, 167, 253, 0.08));
+}
+
+.filmly-movie-explanation-label {
+  display: inline-flex;
+  align-self: flex-start;
+  width: fit-content;
+  padding: 4px 8px;
+  border-radius: 999px;
+  background: rgba(255, 123, 75, 0.14);
+  border: 1px solid rgba(255, 123, 75, 0.22);
+  color: #ffd9cc;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.filmly-movie-explanation-text {
+  margin: 0;
+  color: #eef6ff;
+  font-size: 0.92rem;
+  line-height: 1.65;
+}
+
+.filmly-movie-explanation-signals {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.filmly-movie-explanation-signal {
+  border-radius: 999px;
+  padding: 5px 9px;
+  border: 1px solid rgba(157, 182, 214, 0.18);
+  background: rgba(8, 14, 20, 0.42);
+  color: var(--filmly-text-soft);
+  font-size: 0.74rem;
+}
+
 .filmly-movie-genres {
   display: flex;
   flex-wrap: wrap;

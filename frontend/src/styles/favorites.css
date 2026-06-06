@@ -53,3 +53,91 @@
     align-items: flex-start;
   }
 }
+
+/* ── Shared: Load more / View more button row ─────────────────────────── */
+.filmly-load-more-row {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 12px;
+  margin-top: 24px;
+}
+
+.filmly-load-more-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 28px;
+  border-radius: 999px;
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 0.88rem;
+  font-weight: 600;
+  letter-spacing: 0.03em;
+  cursor: pointer;
+  transition: background 0.2s, color 0.2s, box-shadow 0.2s, transform 0.15s;
+  border: 1.5px solid rgba(104, 160, 255, 0.5);
+  background: rgba(104, 160, 255, 0.12);
+  color: #a8c8ff;
+}
+
+.filmly-load-more-btn:hover:not(:disabled) {
+  background: rgba(104, 160, 255, 0.22);
+  border-color: rgba(104, 160, 255, 0.75);
+  color: #dce9ff;
+  box-shadow: 0 4px 20px rgba(104, 160, 255, 0.18);
+  transform: translateY(-1px);
+}
+
+.filmly-load-more-btn:active:not(:disabled) {
+  transform: translateY(0);
+}
+
+.filmly-load-more-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.filmly-load-more-btn.ghost {
+  background: transparent;
+  border-color: rgba(157, 182, 214, 0.3);
+  color: #7b93b0;
+}
+
+.filmly-load-more-btn.ghost:hover:not(:disabled) {
+  background: rgba(157, 182, 214, 0.08);
+  border-color: rgba(157, 182, 214, 0.55);
+  color: #a9b7cb;
+}
+
+/* ── Dashboard infinite scroll: sentinel + spinner ────────────────────── */
+.filmly-trending-sentinel {
+  height: 1px;
+  width: 100%;
+  margin-top: 8px;
+}
+
+.filmly-trending-loader {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  padding: 28px 0 8px;
+  color: #7b93b0;
+  font-size: 0.9rem;
+  font-family: 'Space Grotesk', sans-serif;
+}
+
+@keyframes filmly-spin {
+  to { transform: rotate(360deg); }
+}
+
+.filmly-trending-spinner {
+  display: inline-block;
+  width: 20px;
+  height: 20px;
+  border: 2.5px solid rgba(104, 160, 255, 0.25);
+  border-top-color: #68a0ff;
+  border-radius: 50%;
+  animation: filmly-spin 0.75s linear infinite;
+  flex-shrink: 0;
+}
