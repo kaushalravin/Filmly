@@ -40,10 +40,10 @@ router.post('/api/login', wrapAsync(async (req, res) => {
   if (!user) {
     throw new AppError("Invalid username or password", 401);
   }
-  
+
   //let test=await bcrypt.hash("demodemo123", 12);
   console.log(password);
-  let test=await bcrypt.compare("$2b$12$XtU9Z77.HTx4tUsnvM/.nupHwUyNtgEN.iqKECdRZRDhr.rHYXnCO", user.password);
+  let test = await bcrypt.compare("$2b$12$XtU9Z77.HTx4tUsnvM/.nupHwUyNtgEN.iqKECdRZRDhr.rHYXnCO", user.password);
   console.log(test);
 
   const isValidPassword = await bcrypt.compare(password, user.password);
@@ -61,7 +61,7 @@ router.post('/api/login', wrapAsync(async (req, res) => {
   res.cookie("token", token, {
     httpOnly: true,
     sameSite: "none",
-    secure: false // true in production
+    secure: true // true in production
   });
 
   res.json({
