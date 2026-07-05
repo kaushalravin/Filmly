@@ -132,31 +132,35 @@ router.get('/api/movie/:tmdbId',wrapAsync(async(req,res)=>{
         throw new AppError("Invalid TMDB ID",400);
     }
 
-    const response1=await movieModel.findOne({tmdbId:tmdbId});
+    let cachedMovie = await movieModel.findOne({tmdbId:tmdbId});
 
-    if(response1){
+    // If cached movie exists and has a populated cast, it is healthy.
+    if(cachedMovie && Array.isArray(cachedMovie.cast) && cachedMovie.cast.length > 0){
         return res.json({
             success:true,
-            data:response1
+            data:cachedMovie
         });
     }
 
-    const response2=await fetchTmdb(`movie/${tmdbId}`, {
-        append_to_response:'credits'
+    const response2 = await fetchTmdb(`movie/${tmdbId}`, {
+        append_to_response: 'credits'
     });
     
-
     if(!response2 || response2.status!==200){
+        if (cachedMovie) {
+            return res.json({ success: true, data: cachedMovie }); // Fallback to cached if TMDB fails
+        }
         throw new AppError("Failed to fetch movie details",500);
     }
 
-    const e=response2.data;
+    const e = response2.data;
 
-    const movie = {
+    const movieUpdate = {
         tmdbId: e.id,
         title: e.title,
         overview: e.overview,
-        genres: (e.genre_ids || []).map(String),
+        // TMDB detail response uses "genres" array of objects, not genre_ids
+        genres: (e.genres || []).map((g) => String(g.id || g)),
         posterPath: e.poster_path,
         releaseDate: e.release_date,
         popularity: e.popularity,
@@ -165,15 +169,28 @@ router.get('/api/movie/:tmdbId',wrapAsync(async(req,res)=>{
             posterPath: actor.profile_path,
             character: actor.character
         })),
+        crew: (e.credits?.crew || []).map((member) => ({
+            name: member.name,
+            posterPath: member.profile_path,
+            character: member.job
+        })),
         trailerUrl: `https://www.youtube.com/results?search_query=${encodeURIComponent(e.title + " official trailer")}`
     };
 
+    if (cachedMovie) {
+        // The movie exists but lacks cast/crew, so we heal the document.
+        Object.assign(cachedMovie, movieUpdate);
+        await cachedMovie.save();
+        return res.json({ success: true, data: cachedMovie });
+    }
+
+    // Completely new movie, needs an embedding
     const aiServiceUrl = process.env.AI_SERVICE_URL;
     if (!aiServiceUrl) {
         throw new AppError('AI service URL is not configured', 500);
     }
 
-    const embeddingText = [movie.title, movie.overview, movie.genres.join(', ')]
+    const embeddingText = [movieUpdate.title, movieUpdate.overview, movieUpdate.genres.join(', ')]
         .filter(Boolean)
         .join('. ');
 
@@ -191,15 +208,14 @@ router.get('/api/movie/:tmdbId',wrapAsync(async(req,res)=>{
         throw new AppError('Failed to add movie embeddings', 502);
     }
 
-    movie.embedding = aiResponse.data.embedding;
-    console.log('embedding has been created for the movie', movie.tmdbId);
+    movieUpdate.embedding = aiResponse.data.embedding;
+    console.log('embedding has been created for the movie', movieUpdate.tmdbId);
 
-    await movieModel.create(movie);
-
+    const newMovie = await movieModel.create(movieUpdate);
 
     res.json({
         success:true,
-        data: movie
+        data: newMovie
     });
 
 }));

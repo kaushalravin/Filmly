@@ -365,6 +365,7 @@ const buildCandidatesPayload = (candidates, recommendResultsMap) => {
             title: movie.title,
             year: movie.releaseDate ? (new Date(movie.releaseDate)).getFullYear() : undefined,
             genres: movie.genres || [],
+            cast: (movie.cast || []).slice(0, 3).map(c => c.name).filter(Boolean),
             overview: truncate(movie.overview, 120)
         };
     });
