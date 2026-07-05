@@ -305,11 +305,11 @@ const buildProfileSummary = async (user) => {
     const watchlater = Array.isArray(user.watchlater) ? user.watchlater : [];
 
     const allReviews = await reviewModel.find({ userId: user._id }).populate('movieId').sort({ _id: -1 });
-    const recentReviews = allReviews.slice(0, 10).map((review) => ({
+    const recentReviews = allReviews.slice(0, 5).map((review) => ({
         movieTitle: review.movieId ? review.movieId.title : undefined,
         genres: Array.isArray(review.movieId?.genres) ? review.movieId.genres.slice(0, 3) : [],
         rating: review.rating,
-        comment: truncate(review.comment, 160)
+        comment: truncate(review.comment, 80)
     }));
 
     const reviewByMovieId = new Map(
@@ -320,14 +320,13 @@ const buildProfileSummary = async (user) => {
 
     const favoriteMovies = favorites
         .map((movie) => {
-        const linkedReview = reviewByMovieId.get(getMongoIdString(movie));
+            const linkedReview = reviewByMovieId.get(getMongoIdString(movie));
 
-        return {
-            id: getMongoIdString(movie),
-            title: movie.title,
-            genres: Array.isArray(movie.genres) ? movie.genres.slice(0, 3) : [],
-            rating: linkedReview?.rating ?? null
-        };
+            return {
+                title: movie.title,
+                genres: Array.isArray(movie.genres) ? movie.genres.slice(0, 3) : [],
+                rating: linkedReview?.rating ?? null
+            };
         })
         .sort((left, right) => {
             const leftRating = typeof left.rating === 'number' ? left.rating : -1;
@@ -353,7 +352,7 @@ const buildProfileSummary = async (user) => {
     return {
         topGenres,
         favorites: favoriteMovies,
-        watchlater: watchlater.slice(0,5).map(m=>({ id: getMongoIdString(m), title: m.title })),
+        watchlater: watchlater.slice(0, 5).map(m => m.title).filter(Boolean),
         recentReviews
     };
 };
@@ -361,22 +360,12 @@ const buildProfileSummary = async (user) => {
 const buildCandidatesPayload = (candidates, recommendResultsMap) => {
     return candidates.map((movie) => {
         const id = movie._id ? movie._id.toString() : movie._id;
-        const sim = recommendResultsMap.get(id) || null;
-        const keywords = [];
-        if (movie.genres && movie.genres.length) keywords.push(...movie.genres.slice(0,3));
-        if (movie.title) keywords.push(...movie.title.split(' ').slice(0,5));
-
         return {
             id,
             title: movie.title,
             year: movie.releaseDate ? (new Date(movie.releaseDate)).getFullYear() : undefined,
             genres: movie.genres || [],
-            overview: truncate(movie.overview, 220),
-            top_keywords: Array.from(new Set(keywords)).slice(0,8),
-            cast: (movie.cast || []).slice(0,2).map(c=>c.name).filter(Boolean),
-            runtime: movie.runtime || undefined,
-            popularity: movie.popularity || 0,
-            sim_score: sim
+            overview: truncate(movie.overview, 120)
         };
     });
 };
