@@ -14,6 +14,33 @@ export default function Recommendations() {
     useEffect(() => {
         let cancelled = false;
 
+        const fetchExplanations = async (movieIds) => {
+            try {
+                const expResponse = await axios.post(`${VITE_BACKEND_BASE}/api/recommendations/explain`, { movieIds });
+                if (!cancelled) {
+                    const explanations = expResponse.data?.data || [];
+                    const expMap = new Map(explanations.map(e => [String(e.id), e]));
+                    
+                    setMovies(prevMovies => prevMovies.map(movie => {
+                        const explanation = expMap.get(String(movie._id));
+                        if (explanation) {
+                            return { ...movie, explanation };
+                        }
+                        // if failed, we stop showing skeleton by making it undefined
+                        return movie.explanation === null ? { ...movie, explanation: undefined } : movie;
+                    }));
+                }
+            } catch (error) {
+                console.error("Error fetching explanations:", error);
+                if (!cancelled) {
+                    // Turn off loading skeletons on error
+                    setMovies(prevMovies => prevMovies.map(movie => 
+                        movie.explanation === null ? { ...movie, explanation: undefined } : movie
+                    ));
+                }
+            }
+        };
+
         const fetchRecommendations = async () => {
             try {
                 setLoading(true);
@@ -22,7 +49,13 @@ export default function Recommendations() {
                 const response = await axios.get(`${VITE_BACKEND_BASE}/api/recommendations`);
 
                 if (!cancelled) {
-                    setMovies(response.data?.data || []);
+                    const loadedMovies = response.data?.data || [];
+                    setMovies(loadedMovies);
+
+                    if (loadedMovies.length > 0) {
+                        const movieIds = loadedMovies.map(m => m._id);
+                        fetchExplanations(movieIds);
+                    }
                 }
             } catch (error) {
                 console.error("Error fetching recommendations:", error);

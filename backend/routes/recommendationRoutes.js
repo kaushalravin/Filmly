@@ -141,66 +141,16 @@ router.get('/api/recommendations',isLoggedIn,wrapAsync(async(req,res)=>{
     if(movieIds.length){
         const movies=await movieModel.find({_id:{$in:movieIds}});
         const movieMap = new Map(movies.map((movie) => [movie._id.toString(), movie]));
-        // convert Mongoose documents to plain objects so added properties (explanation) serialize in JSON
+        // convert Mongoose documents to plain objects so added properties serialize in JSON
         let orderedMovies = movieIds.map((movieId) => movieMap.get(movieId.toString())).filter(Boolean);
-        orderedMovies = orderedMovies.map(m => (m && typeof m.toObject === 'function') ? m.toObject() : m).slice(0, 25);
+        orderedMovies = orderedMovies.map(m => (m && typeof m.toObject === 'function') ? m.toObject() : m).slice(0, 12);
 
-        const profileSummary = await buildProfileSummary(user);
-        const recommendMap = new Map(recommedations.data.results.map((entry) => [getMongoIdString(entry.movie_id), entry.score || entry.similarity || null]));
-        const candidates = buildCandidatesPayload(orderedMovies, recommendMap);
-        const promptPayload = {
-            user_profile: profileSummary,
-            candidates,
-            instructions: 'You will receive 25 candidate movies. Return ONLY the best 12 matches from these 25, ordered from strongest to weakest. Each item must be {id, score, reason, signals}. Score must be 0.0 to 1.0. Use only the provided fields. Keep each reason to 1-2 sentences.'
-        };
-
-        let selectedMovies = [];
-
-        try {
-            console.log('[recommendations] sending current-system payload to Gemini', {
-                userId: req.user.id,
-                model: process.env.GEMINI_MODEL || 'gemini-2.5-flash',
-                candidateCount: candidates.length,
-                topGenres: profileSummary.topGenres,
-                topCandidates: candidates.slice(0, 5).map((candidate) => ({ id: candidate.id, title: candidate.title }))
-            });
-
-            const explanations = await callLLMExplain(promptPayload);
-            console.log('[recommendations] Gemini reasoning result count', Array.isArray(explanations) ? explanations.length : 0);
-            console.log('[recommendations] Gemini reasoning preview', Array.isArray(explanations) ? explanations.slice(0, 3) : explanations);
-
-            const explanationMap = new Map(
-                (Array.isArray(explanations) ? explanations : []).map((entry) => [String(entry.id), entry])
-            );
-
-            for (const explanation of (Array.isArray(explanations) ? explanations : [])) {
-                const selectedMovie = orderedMovies.find((movie) => getMongoIdString(movie._id) === String(explanation.id));
-                if (selectedMovie) {
-                    selectedMovie.explanation = explanation;
-                    selectedMovies.push(selectedMovie);
-                }
-            }
-
-            if (selectedMovies.length < 12) {
-                for (const movie of orderedMovies) {
-                    if (selectedMovies.length >= 12) break;
-                    if (!selectedMovies.some((selectedMovie) => getMongoIdString(selectedMovie._id) === getMongoIdString(movie._id))) {
-                        movie.explanation = explanationMap.get(getMongoIdString(movie._id)) || null;
-                        selectedMovies.push(movie);
-                    }
-                }
-            }
-        } catch (error) {
-            console.error('[recommendations] Gemini reasoning failed', error?.message || error);
-            selectedMovies = orderedMovies.slice(0, 12).map((movie) => ({
-                ...movie,
-                explanation: null,
-            }));
-        }
+        // Pre-fill null explanation so frontend knows it's pending
+        orderedMovies = orderedMovies.map(m => ({ ...m, explanation: null }));
 
         return res.json({
             success:true,
-            data:selectedMovies.slice(0, 12)
+            data:orderedMovies
         });
      }
 
@@ -208,6 +158,45 @@ router.get('/api/recommendations',isLoggedIn,wrapAsync(async(req,res)=>{
         success:true,
         data:[]
     });
+}));
+
+router.post('/api/recommendations/explain', isLoggedIn, express.json(), wrapAsync(async (req, res) => {
+    const { movieIds } = req.body;
+    if (!Array.isArray(movieIds) || movieIds.length === 0) {
+        throw new AppError("movieIds array is required", 400);
+    }
+
+    const user = await userModel.findById(req.user.id).populate('favorites').populate('watchlater');
+    if (!user) {
+        throw new AppError("User not found", 404);
+    }
+
+    const movies = await movieModel.find({ _id: { $in: movieIds } });
+    const movieMap = new Map(movies.map((movie) => [movie._id.toString(), movie]));
+    const orderedMovies = movieIds.map((id) => movieMap.get(id.toString())).filter(Boolean);
+
+    if (orderedMovies.length === 0) {
+        return res.json({ success: true, data: [] });
+    }
+
+    const profileSummary = await buildProfileSummary(user);
+    const candidates = buildCandidatesPayload(orderedMovies, new Map());
+
+    const promptPayload = {
+        user_profile: profileSummary,
+        candidates
+    };
+
+    try {
+        const explanations = await callLLMExplain(promptPayload);
+        return res.json({
+            success: true,
+            data: explanations
+        });
+    } catch (error) {
+        console.error('[recommendations/explain] Gemini reasoning failed', error?.message || error);
+        throw new AppError("Failed to generate explanations", 502);
+    }
 }));
 
 router.get('/api/more-like-this/:tmdbId',isLoggedIn,wrapAsync(async(req,res)=>{
@@ -401,13 +390,11 @@ Your job is to convert the provided user profile and candidate movies into a STR
 You MUST follow these rules:
 
 1. Return ONLY valid JSON. No explanation, no extra text.
-2. Each item must have: id, score, reason, signals.
-3. score must be a number from 0 to 1.
-4. reason must be a short explanation based only on the provided data.
-5. signals must be a short array of the strongest matching signals.
-6. Do not invent actors, genres, or preferences that are not present in the input.
-7. If unsure, use a lower score and a generic reason.
-8. Return only the top 12 matching candidates from the list below.
+2. Each item must have: id, reason, signals.
+3. reason must be a short explanation (1-2 sentences) of why the user would like the movie, based ONLY on the provided data.
+4. signals must be a short array of the strongest matching signals (e.g. ["Action", "Tom Cruise"]).
+5. Do not invent actors, genres, or preferences that are not present in the input.
+6. You MUST return an explanation for EVERY candidate movie in the list below. Do not drop any movies.
 
 Today is ${today} (${timeZone}).
 Yesterday is ${yesterday}.
@@ -424,7 +411,6 @@ Return JSON in EXACTLY this format:
 [
   {
     "id": "string",
-    "score": number,
     "reason": "string",
     "signals": ["string"]
   }

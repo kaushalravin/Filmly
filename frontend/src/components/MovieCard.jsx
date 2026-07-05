@@ -60,7 +60,13 @@ export default function MovieCard({ movie, index, ctaLabel = "View details" }) {
 
         <p className="filmly-movie-overview">{movie?.overview || "No description available."}</p>
 
-        {explanation?.reason && (
+        {movie.explanation === null ? (
+          <div className="filmly-movie-explanation filmly-movie-explanation-loading" aria-label="Loading explanation">
+            <span className="filmly-movie-explanation-label" style={{ opacity: 0.5 }}>Asking Gemini...</span>
+            <div style={{ height: '12px', background: 'rgba(255,255,255,0.1)', borderRadius: '4px', margin: '8px 0 4px', width: '80%', animation: 'pulse 1.5s infinite' }}></div>
+            <div style={{ height: '12px', background: 'rgba(255,255,255,0.1)', borderRadius: '4px', width: '60%', animation: 'pulse 1.5s infinite' }}></div>
+          </div>
+        ) : explanation?.reason ? (
           <div className="filmly-movie-explanation" aria-label="Why this movie is recommended">
             <span className="filmly-movie-explanation-label">Why it fits</span>
             <p className="filmly-movie-explanation-text">{explanation.reason}</p>
@@ -74,7 +80,7 @@ export default function MovieCard({ movie, index, ctaLabel = "View details" }) {
               </div>
             )}
           </div>
-        )}
+        ) : null}
 
         {movieGenres.length > 0 && (
           <div className="filmly-movie-genres" aria-label="Movie genres">
