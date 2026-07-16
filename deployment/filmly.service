@@ -1,0 +1,19 @@
+[Unit]
+Description=Filmly AI Service
+After=network.target
+
+[Service]
+User=azureuser
+Group=azureuser
+WorkingDirectory=/home/azureuser/Filmly/AI_service
+
+Environment="PATH=/home/azureuser/Filmly/AI_service/venv/bin"
+EnvironmentFile=/home/azureuser/Filmly/AI_service/.env
+
+ExecStart=/home/azureuser/Filmly/AI_service/venv/bin/python -m uvicorn app.main:app --host 0.0.0.0 --port 8000
+
+Restart=always
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target

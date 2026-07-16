@@ -25,10 +25,15 @@ echo "[6/8] Installing Python packages..."
 pip install -r requirements.txt
 
 echo "[7/8] Installing systemd service..."
-sudo cp ../deployment/filmly.service /etc/systemd/system/
 
-sudo systemctl daemon-reload
-sudo systemctl enable filmly
+if [ -f ../deployment/filmly.service ]; then
+    sudo cp ../deployment/filmly.service /etc/systemd/system/
+    sudo systemctl daemon-reload
+    sudo systemctl enable filmly
+    echo "✓ systemd service installed."
+else
+    echo "⚠ deployment/filmly.service not found. Skipping."
+fi
 
 echo "[8/8] Setup completed!"
 
